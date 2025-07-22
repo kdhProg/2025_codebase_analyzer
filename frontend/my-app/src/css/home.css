@@ -1,0 +1,9 @@
+.home-entire-container{
+    display: flex;
+    flex-direction: column;
+}
+
+.home-entire-container>div{
+    border: 1px solid orange;
+    text-align: center;
+}

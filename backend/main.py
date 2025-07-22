@@ -1,10 +1,9 @@
-# backend/main.py
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware # CORS 미들웨어 추가
+from fastapi.middleware.cors import CORSMiddleware
+from api import file_scan
 
 app = FastAPI()
 
-# CORS 설정: 프론트엔드(React)와 백엔드가 다른 포트에서 실행되므로 CORS 허용이 필요합니다.
 origins = [
     "http://localhost:3000",  # React 개발 서버 기본 포트
     # "http://localhost",
@@ -18,6 +17,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# --- 라우터 포함 ---
+app.include_router(file_scan.router) # scan.py의 router 인스턴스를 포함
 
 @app.get("/")
 async def read_root():

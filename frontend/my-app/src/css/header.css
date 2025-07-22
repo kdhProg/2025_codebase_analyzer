@@ -1,0 +1,24 @@
+.header-entire-container{
+
+    display: flex;
+    flex-direction: row;
+
+    justify-content: space-between;
+    align-items: center;
+
+    background-color: rgb(42, 42, 42);
+
+    height: 100px;
+    min-width: 1000px;
+
+    padding-left: 50px;
+    padding-right: 50px;
+}
+
+.header-entire-container>div{
+    border:red 1px solid;
+}
+
+.header-entire-container>div>p{
+    color: white;
+}
