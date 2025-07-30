@@ -25,7 +25,7 @@ EXCLUDE_DIRS = {
 INCLUDE_EXTENSIONS = {
     ".py", ".js", ".ts", ".jsx", ".tsx", ".java", ".c", ".cpp", ".h", ".hpp",
     ".go", ".rb", ".php", ".cs", ".swift", ".kt", ".rs", ".json", ".xml", ".yml", ".yaml",
-    ".toml", ".md", ".txt"
+    ".toml", ".md", ".txt", ".css"
 }
 
 
@@ -40,7 +40,7 @@ def scan_directory_recursive(
     node_type = "directory" if is_dir else "file"
     name = current_path.name
     relative_path = str(current_path.relative_to(base_path))
-
+    # print(f'base_path : {base_path}   current_path : {current_path}    relative_path : {relative_path}')
     node = FileNode(
         name=name,
         type=node_type,
@@ -53,8 +53,9 @@ def scan_directory_recursive(
         node.children = [] # 하위 탐색 안함
         return node
     
-    if not is_dir and current_path.suffix.lower() not in include_extensions:
-        return None
+    # include_extensions를 사용시
+    # if not is_dir and current_path.suffix.lower() not in include_extensions:
+    #     return None
 
 
     if is_dir:

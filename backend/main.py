@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from api import file_scan
+from api import file_analysis
 
 app = FastAPI()
 
@@ -19,12 +20,9 @@ app.add_middleware(
 )
 
 # --- 라우터 포함 ---
-app.include_router(file_scan.router) # scan.py의 router 인스턴스를 포함
+app.include_router(file_scan.router)
+app.include_router(file_analysis.router)
 
 @app.get("/")
 async def read_root():
-    return {"message": "Hello from FastAPI Backend!"}
-
-@app.get("/api/data")
-async def get_data():
-    return {"data": "This is some data from FastAPI!"}
+    return {"message": "backend server test"}
