@@ -6,9 +6,8 @@ from tree_sitter import Language, Parser
 from tree_sitter_language_pack import get_language
 import traceback
 
-# Tree-sitter 언어 로드 (애플리케이션 시작 시 한 번만 실행되도록 관리하는 것이 좋음)
-# 실제 애플리케이션에서는 FastAPI의 startup 이벤트나 의존성 주입을 통해
-# 파서를 초기화하고 재사용하는 것이 효율적입니다.
+from service.extractors.python_extractor import extract_python_entities_and_relationships
+
 try:
     # 예시로 Python과 JavaScript만 로드. 필요에 따라 더 추가하세요.
     PYTHON_LANGUAGE = get_language('python')
@@ -87,6 +86,8 @@ def parse_code_with_tree_sitter(code_content: str, language: str) -> Optional[Di
     
     print(f"DEBUG: Successfully parsed {language} file. Root node type: {tree.root_node.type}, Text length: {len(tree.root_node.text)}")
      # -----------------tree object debug end-----------------
+    # s_exp_representation = tree.root_node.sexp()
+    # print(f"DEBUG: S-Expression for {language} file (first 500 chars):\n{s_exp_representation[:500]}...")
 
     parsed_nodes: List[Dict[str, Any]] = []
 
@@ -120,32 +121,17 @@ def parse_code_with_tree_sitter(code_content: str, language: str) -> Optional[Di
     extracted_entities = []
     extracted_relationships = []
 
-    # AST를 다시 순회하며 특정 패턴 추출 (예시)
-    for node_info in parsed_nodes:
-        if node_info['is_named']:
-            # Python 함수 정의 예시
-            if language == 'python' and node_info['type'] == 'function_definition':
-                # 함수 이름을 정확히 추출하는 로직은 Tree-sitter 쿼리를 사용하면 더 견고합니다.
-                # 여기서는 간단한 예시로 'identifier' 타입의 자식 노드를 찾습니다.
-                name_node = next((nodes_map[cid] for cid in node_info['children_ids'] if nodes_map[cid]['type'] == 'identifier'), None)
-                func_name = name_node['text'] if name_node else f"unknown_func_{node_info['id']}"
-                extracted_entities.append({
-                    "type": "function",
-                    "id": f"func_{func_name}_{node_info['start_point']['row']}", # 고유 ID 생성
-                    "name": func_name,
-                    "file_location": f"{node_info['start_point']['row']}:{node_info['start_point']['column']}"
-                })
-            # 함수 호출 예시 (더 복잡한 로직 필요)
-            elif language == 'python' and node_info['type'] == 'call':
-                function_called_node = next((nodes_map[cid] for cid in node_info['children_ids'] if nodes_map[cid]['type'] == 'identifier'), None)
-                if function_called_node:
-                    called_name = function_called_node['text']
-                    extracted_relationships.append({
-                        "source_id": "current_context", # 호출이 일어난 현재 함수/클래스 ID (외부에서 주입 필요)
-                        "target_id": f"func_{called_name}", # 호출 대상 함수 ID (매칭 로직 필요)
-                        "type": "CALLS"
-                    })
-            # TODO: 클래스, 변수, 상속 등 다른 엔티티 및 관계 추출 로직 추가
+    if language == 'python':
+        extracted_entities, extracted_relationships = \
+            extract_python_entities_and_relationships(tree, _LANGUAGES[language])
+            # extract_python_entities_and_relationships(parsed_nodes, nodes_map)
+    # TODO: elif language == 'javascript':
+    #           extracted_entities, extracted_relationships = \
+    #               extract_javascript_entities_and_relationships(parsed_nodes, nodes_map)
+    # TODO: 다른 언어에 대한 처리 추가
+
+    print(f"DEBUG: Final extracted entities count: {len(extracted_entities)}")
+    print(f"DEBUG: Final extracted relationships count: {len(extracted_relationships)}")
 
     return {
         "root_node_id": f"{tree.root_node.id}",
