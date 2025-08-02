@@ -6,6 +6,7 @@ from pathlib import Path
 import os
 
 # 모델 임포트
+from db.ingestor_python import ingest_code_graph_data
 from models.analysis_request import CodeAnalysisRequest
 
 # 서비스 임포트
@@ -47,13 +48,14 @@ async def analyze_selected_code_endpoint(request: CodeAnalysisRequest) -> Dict[s
             
             if language:
                 # Tree-sitter 파싱 서비스 호출
-                parsed_data = parse_code_with_tree_sitter(code_content, language)
+                parsed_data = parse_code_with_tree_sitter(code_content, language, file_path)
                 
                 if parsed_data:
-                    # TODO: 여기에서 parsed_data (파싱 결과물)를 Neo4j와 같은
-                    # 지식 그래프 DB에 저장하는 로직을 구현합니다.
-                    # 예: knowledge_graph_db_service.save_code_graph(file_path, parsed_data)
-                    # (KnowledgeGraphDB 서비스는 이 프로젝트 범위 밖이므로 별도 구현 필요)
+                    # save to DB
+                    ingest_code_graph_data(
+                        parsed_data["extracted_entities"],
+                        parsed_data["extracted_relationships"]
+                    )
 
                     analysis_summary["analyzed_files_details"].append({
                         "file_path": str(file_path.relative_to(project_root)), # 루트 경로에 대한 상대 경로

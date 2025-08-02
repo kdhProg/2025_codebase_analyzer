@@ -62,7 +62,7 @@ def detect_language_from_filename(file_path: str) -> Optional[str]:
     return _EXT_TO_LANGUAGE_MAP.get(ext)
 
 
-def parse_code_with_tree_sitter(code_content: str, language: str) -> Optional[Dict[str, Any]]:
+def parse_code_with_tree_sitter(code_content: str, language: str, file_path:str) -> Optional[Dict[str, Any]]:
     """
     주어진 코드 내용을 Tree-sitter로 파싱하여 AST 정보를 반환합니다.
     반환되는 AST 정보는 JSON 직렬화를 위해 단순화된 형태입니다.
@@ -123,7 +123,7 @@ def parse_code_with_tree_sitter(code_content: str, language: str) -> Optional[Di
 
     if language == 'python':
         extracted_entities, extracted_relationships = \
-            extract_python_entities_and_relationships(tree, _LANGUAGES[language])
+            extract_python_entities_and_relationships(tree, _LANGUAGES[language],file_path)
             # extract_python_entities_and_relationships(parsed_nodes, nodes_map)
     # TODO: elif language == 'javascript':
     #           extracted_entities, extracted_relationships = \

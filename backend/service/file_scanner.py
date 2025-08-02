@@ -1,4 +1,3 @@
-# backend/services/scanner.py
 import os
 from pathlib import Path
 from typing import List, Optional, Literal
