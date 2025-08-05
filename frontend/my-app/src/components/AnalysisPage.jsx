@@ -109,7 +109,7 @@ function AnalysisPage({ projectRootPath, selectedPaths, onAnalysisComplete, onAn
   if (status === 'analyzing') {
     return (
       <div className="analysis-container analyzing-container">
-        <h2 className="analysis-title">코드 분석 중... ({progress.toFixed(0)}%)</h2>
+        <h2 className="analysis-title">코드 분석 중 ({progress.toFixed(0)}%)</h2>
         <p className="analysis-subtitle">
           현재 분석 중인 파일: <strong className="current-file-path">{currentFile || '파일 로딩 중...'}</strong>
         </p>
@@ -121,7 +121,7 @@ function AnalysisPage({ projectRootPath, selectedPaths, onAnalysisComplete, onAn
             {progress.toFixed(0)}%
           </div>
         </div>
-        <p className="analysis-description">선택된 파일을 분석하고 지식 그래프를 생성하고 있습니다. 잠시만 기다려 주세요.</p>
+        <p className="analysis-description">파일 분석 및 지식그래프 생성 중..</p>
         <div className="spinner"></div>
       </div>
     );
@@ -130,10 +130,10 @@ function AnalysisPage({ projectRootPath, selectedPaths, onAnalysisComplete, onAn
   if (status === 'error') {
     return (
       <div className="analysis-container error-container">
-        <h2 style={{ color: '#cc0000' }}>오류 발생!</h2>
+        <h2 style={{ color: '#cc0000' }}>오류 발생</h2>
         <p style={{ fontSize: '1.1em' }}>{error}</p>
         <button 
-          onClick={() => onAnalysisError("사용자 요청으로 다시 시도합니다.")} 
+          onClick={() => onAnalysisError("재시도")} 
           className="error-button"
         >
           파일 재선택

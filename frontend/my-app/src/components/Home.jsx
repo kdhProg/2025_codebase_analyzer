@@ -43,9 +43,15 @@ function Home() {
     };
 
     const handleDirectorySelectorError = (errorMessage) => {
-        setError(errorMessage);
-        setIsLoading(false);
-        setAppStage('error_display');
+        // 에러 메시지가 있을 때만 에러 페이지로 전환
+        if (errorMessage) {
+            setError(errorMessage);
+            setIsLoading(false);
+            setAppStage('error_display');
+        } else {
+            // 에러 메시지가 없으면 에러 상태만 초기화하고, 화면 전환은 하지 않습니다.
+            setError(null);
+        }
     };
 
     const handleStartAnalysisFromExplorer = (rootPath, paths) => {
@@ -138,7 +144,7 @@ function Home() {
                         }}
                         className="error-retry-button"
                     >
-                        처음으로 돌아가 다시 시도
+                        재시도
                     </button>
                 </div>
             );

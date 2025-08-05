@@ -52,7 +52,6 @@ const DirectorySelector = ({ onScanResult, onLoadingChange, onError }) => {
 
     return (
         <div className="directory-selector-container">
-            <h2>프로젝트 폴더 선택</h2>
             <form onSubmit={handleSubmit} className="directory-selector-form">
                 <label htmlFor="projectPath">
                     프로젝트 경로 입력:
