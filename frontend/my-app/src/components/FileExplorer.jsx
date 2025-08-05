@@ -1,5 +1,8 @@
+// src/components/FileExplorer.jsx
+
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import apiClient from '../config/apiClient';
+// apiClient 임포트는 더 이상 필요하지 않아 제거되었습니다.
+// import apiClient from '../config/apiClient';
 
 // FileNodeItem 컴포넌트는 이전 답변과 동일하게 유지됩니다.
 function FileNodeItem({ node, onToggleCheck, isCheckedMap }) {
@@ -85,7 +88,8 @@ function FileNodeItem({ node, onToggleCheck, isCheckedMap }) {
 }
 
 // FileExplorer 컴포넌트
-function FileExplorer({ node, projectRootPath }) {
+// onAnalyze prop을 추가했습니다.
+function FileExplorer({ node, projectRootPath, onAnalyze }) {
     const [isCheckedMap, setIsCheckedMap] = useState({});
 
     useEffect(() => {
@@ -101,15 +105,6 @@ function FileExplorer({ node, projectRootPath }) {
         }
         setIsCheckedMap(initialCheckedState);
     }, [node]);
-
-    const setChildrenCheckedState = useCallback((currentNode, checked, currentMap) => {
-        currentMap[currentNode.path] = checked;
-        if (currentNode.type === 'directory' && currentNode.children) {
-            currentNode.children.forEach(child => {
-                setChildrenCheckedState(child, checked, currentMap);
-            });
-        }
-    }, []);
 
     const findNode = useCallback((currentNode, targetPath) => {
         if (currentNode.path === targetPath) {
@@ -180,52 +175,16 @@ function FileExplorer({ node, projectRootPath }) {
             
             return newMap;
         });
-    }, [node, findNode]); // findNode를 의존성 배열에 추가
+    }, [node, findNode]); 
 
-    const handleAnalyzeClick = async () => {
+    // API 호출 로직을 제거하고, onAnalyze 콜백을 호출하도록 수정했습니다.
+    const handleAnalyzeClick = () => {
         const selectedPaths = Object.keys(isCheckedMap).filter(path => isCheckedMap[path]);
-
-        const payload = {
-            project_root_path: projectRootPath,
-            selected_paths: selectedPaths,
-        };
-
-        try {
-            // axios를 사용하여 POST 요청 전송
-            const response = await apiClient.post('/analyze/analyze-selected-code', payload, {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-
-            alert('분석 요청 성공: ' + JSON.stringify(response.data, null, 2));
-        } catch (error) {
-            if (error.response) {
-                console.error('분석 요청 실패 (서버 응답):', error.response.data);
-                
-                // 💡 여기를 수정합니다: 서버 응답의 'detail' 필드를 더 자세히 표시
-                let errorMessage = '알 수 없는 서버 오류';
-                if (error.response.data && error.response.data.detail) {
-                    if (Array.isArray(error.response.data.detail)) {
-                        // detail이 배열인 경우, 각 오류 메시지를 추출하여 표시
-                        errorMessage = error.response.data.detail.map(err => {
-                            const loc = err.loc ? err.loc.join('.') : 'unknown';
-                            return `${loc}: ${err.msg}`;
-                        }).join('\n'); // 줄바꿈으로 여러 오류 표시
-                    } else if (typeof error.response.data.detail === 'string') {
-                        // detail이 문자열인 경우 (일반적인 오류 메시지)
-                        errorMessage = error.response.data.detail;
-                    }
-                }
-                alert('분석 요청 실패: ' + errorMessage);
-
-            } else if (error.request) {
-                console.error('분석 요청 실패 (네트워크 오류):', error.request);
-                alert('네트워크 오류 또는 서버에 연결할 수 없습니다.');
-            } else {
-                console.error('분석 요청 실패 (클라이언트 오류):', error.message);
-                alert('분석 요청 중 오류 발생: ' + error.message);
-            }
+        
+        // 부모 컴포넌트인 Home.jsx에 분석 시작을 알리기 위해 onAnalyze 콜백을 호출합니다.
+        // 선택된 경로와 프로젝트 루트 경로를 인자로 전달합니다.
+        if (onAnalyze) {
+            onAnalyze(projectRootPath, selectedPaths);
         }
     };
 
@@ -241,7 +200,21 @@ function FileExplorer({ node, projectRootPath }) {
                 isCheckedMap={isCheckedMap}
             />
             <hr style={{ marginTop: '20px' }} />
-            <button onClick={handleAnalyzeClick}>선택 완료 및 분석 시작</button>
+            <button 
+                onClick={handleAnalyzeClick}
+                style={{ 
+                    padding: '10px 20px', 
+                    fontSize: '16px', 
+                    backgroundColor: '#007bff', 
+                    color: 'white', 
+                    border: 'none', 
+                    borderRadius: '5px', 
+                    cursor: 'pointer', 
+                    transition: 'background-color 0.3s' 
+                }}
+            >
+                선택 완료 및 분석 시작
+            </button>
         </div>
     );
 }
