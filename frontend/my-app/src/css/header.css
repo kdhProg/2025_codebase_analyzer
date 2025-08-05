@@ -1,24 +1,65 @@
-.header-entire-container{
+/* src/components/Header.css */
 
-    display: flex;
-    flex-direction: row;
-
-    justify-content: space-between;
-    align-items: center;
-
-    background-color: rgb(42, 42, 42);
-
-    height: 100px;
-    min-width: 1000px;
-
-    padding-left: 50px;
-    padding-right: 50px;
+/* 전체 헤더 컨테이너 */
+.header-entire-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between; /* 로고와 메뉴를 양 끝으로 정렬 */
+  align-items: center;
+  
+  background-color: #252526; /* 다크 테마 배경색 */
+  color: #e0e0e0; /* 밝은 텍스트 색상 */
+  
+  height: 80px; /* 높이를 약간 줄여서 미니멀하게 */
+  padding: 0 50px; /* 좌우 패딩 */
+  min-width: 1000px;
+  
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4); /* 헤더에 그림자 효과 추가 */
 }
 
-.header-entire-container>div{
-    border:red 1px solid;
+/* 로고 섹션 (임시 border 제거) */
+.header-entire-container .logo-section {
+  display: flex;
+  align-items: center;
 }
 
-.header-entire-container>div>p{
-    color: white;
+.header-entire-container .logo-section h1 {
+  margin: 0;
+  font-size: 1.8em;
+  font-weight: 600;
+  color: #ffffff; /* 로고 색상을 더 밝게 */
+}
+
+/* 메뉴 및 버튼 섹션 */
+.header-entire-container .menu-section {
+  display: flex;
+  align-items: center;
+  gap: 20px; /* 메뉴 항목 간 간격 */
+}
+
+.header-entire-container .menu-section p {
+  color: #cccccc; /* 메뉴 텍스트 색상 */
+  font-size: 1em;
+  margin: 0;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.header-entire-container .menu-section p:hover {
+  color: #ffffff; /* 호버 시 색상 변경 */
+}
+
+/* 클립 버튼 스타일 */
+.header-entire-container .clip-button {
+  background: none;
+  border: none;
+  color: #cccccc;
+  font-size: 1.5em; /* 아이콘 크기 */
+  cursor: pointer;
+  transition: transform 0.3s, color 0.3s;
+}
+
+.header-entire-container .clip-button:hover {
+  color: #ffffff;
+  transform: scale(1.1);
 }

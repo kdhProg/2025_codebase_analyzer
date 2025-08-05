@@ -1,0 +1,67 @@
+/* src/components/DirectorySelector.css */
+
+.directory-selector-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 30px;
+  border-radius: 8px;
+  background-color: #2e2e2e;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.directory-selector-container h2 {
+  font-size: 1.5em;
+  color: #e0e0e0;
+}
+
+.directory-selector-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+}
+
+.directory-selector-form label {
+  font-weight: bold;
+  color: #c0c0c0;
+}
+
+.directory-selector-form input[type="text"] {
+  width: 300px;
+  padding: 10px; /* 패딩 증가 */
+  border: 1px solid #444; /* 어두운 테두리 */
+  border-radius: 4px;
+  background-color: #3e3e3e; /* 입력창 배경색 */
+  color: #ffffff; /* 입력 텍스트 색상 */
+  font-size: 1em;
+}
+
+.directory-selector-form button {
+  padding: 10px 20px;
+  font-size: 1em;
+  color: #ffffff; /* 버튼 텍스트 색상 */
+  background-color: #007bff; /* 파란색 강조색 */
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.directory-selector-form button:hover:not(:disabled) {
+  background-color: #0056b3; /* 호버 시 더 어두운 파란색 */
+}
+
+.directory-selector-form button:disabled {
+  background-color: #444; /* 비활성화 버튼 색상 */
+  color: #888;
+  cursor: not-allowed;
+}
+
+.error-message {
+  color: #ff6347; /* 다크 테마에 맞는 밝은 빨간색 */
+  font-size: 0.9em;
+  margin-top: 10px;
+}
