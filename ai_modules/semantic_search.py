@@ -3,7 +3,7 @@ import pickle
 from transformers import AutoTokenizer, AutoModel
 
 class SemanticSearcher:
-    def __init__(self, embedding_file_path, model_name = "microsoft/codebert-base")
+    def __init__(self, embedding_file_path, model_name = "microsoft/codebert-base"):
         print("SemanticSearcher: 초기화 시작...")
 
         # 1. 미리 계산된 코드 임베딩 로드
@@ -36,7 +36,7 @@ class SemanticSearcher:
         # 5. 가장 높은 점수를 가진 top_k개의 결과 추출
         top_results = torch.topk(cos_scores, k = min(top_k, len(self.code_embeddings)))
 
-        results = 
+        results = []
         for score, idx in zip(top_results.values, top_results.indices):
             results.append({
                 "node_id": self.node_ids[idx],

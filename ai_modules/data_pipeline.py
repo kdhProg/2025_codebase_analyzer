@@ -32,8 +32,8 @@ def create_code_embeddings(graph_data, model_name = "microsoft/codebert-base"):
     model = AutoModel.from_pretrained(model_name)
     print("모델 로딩 완료.")
 
-    node_texts =
-    node_ids =
+    node_texts = []
+    node_ids = []
 
     # 그래프의 모든 노드를 순회하며 텍스트 추출
 
