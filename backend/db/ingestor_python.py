@@ -6,11 +6,12 @@ from db.driver_neo4j import run_cypher_query # DB 쿼리 실행 유틸리티 임
 def ingest_code_graph_data(extracted_entities: list, extracted_relationships: list):
     """
     추출된 엔티티와 관계 정보를 Neo4j 데이터베이스에 삽입합니다.
+    엔티티에 'code_snippet' 속성을 추가하여 저장합니다.
 
     Args:
         extracted_entities (list): 각 엔티티를 나타내는 딕셔너리 리스트.
-                                   각 딕셔너리는 'type', 'name', 'file_path', 'start_line', 'end_line'
-                                   등의 키를 포함해야 합니다.
+                                   각 딕셔너리는 'type', 'name', 'file_path', 'start_line', 'end_line',
+                                   'code_snippet' 등의 키를 포함해야 합니다.
         extracted_relationships (list): 각 관계를 나타내는 딕셔너리 리스트.
                                         각 딕셔너리는 'source_id', 'target_id', 'type'
                                         키를 포함해야 하며, 선택적으로 'properties' 키를 포함할 수 있습니다.
@@ -40,12 +41,14 @@ def ingest_code_graph_data(extracted_entities: list, extracted_relationships: li
                     n.name = $name,
                     n.file_path = $file_path,
                     n.start_line = $start_line,
-                    n.end_line = $end_line
+                    n.end_line = $end_line,
+                    n.code_snippet = $code_snippet
                 ON MATCH SET
                     n.name = $name,
                     n.file_path = $file_path,
                     n.start_line = $start_line,
-                    n.end_line = $end_line
+                    n.end_line = $end_line,
+                    n.code_snippet = $code_snippet
             """
             # None 값은 Cypher에서 무시되므로, 없는 속성은 설정되지 않습니다.
             run_cypher_query(query, parameters={
@@ -53,7 +56,8 @@ def ingest_code_graph_data(extracted_entities: list, extracted_relationships: li
                 'name': entity.get('name'),
                 'file_path': entity.get('file_path'),
                 'start_line': entity.get('start_line'),
-                'end_line': entity.get('end_line')
+                'end_line': entity.get('end_line'),
+                'code_snippet': entity.get('code_snippet')
             }, write=True)
         print(f"✅ {len(extracted_entities)}개 엔티티(노드) 삽입/업데이트 완료.")
 
@@ -85,7 +89,7 @@ def ingest_code_graph_data(extracted_entities: list, extracted_relationships: li
         print(f"✅ {len(extracted_relationships)}개 관계(엣지) 삽입 완료.")
 
     except Exception as e:
-        print(f" Neo4j 데이터 삽입 중 오류 발생: {e}")
+        print(f"❌ Neo4j 데이터 삽입 중 오류 발생: {e}")
         raise # 오류 발생 시 상위 호출자에게 예외를 다시 발생시킵니다.
 
     print("--- Neo4j 데이터 삽입 완료 ---")

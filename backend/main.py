@@ -2,8 +2,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from api import file_scan
 from api import file_analysis
+from api import semantic_search_api
 
-app = FastAPI()
+app = FastAPI(lifespan=semantic_search_api.lifespan)
 
 origins = [
     "http://localhost:3000",  # React 개발 서버 기본 포트
@@ -22,6 +23,7 @@ app.add_middleware(
 # --- 라우터 포함 ---
 app.include_router(file_scan.router)
 app.include_router(file_analysis.router)
+app.include_router(semantic_search_api.router)
 
 @app.get("/")
 async def read_root():
