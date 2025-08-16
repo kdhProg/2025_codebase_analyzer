@@ -39,7 +39,7 @@ async def lifespan(app: APIRouter):
 @router.post("/semantic-search", response_model=str)
 async def semantic_search_endpoint(request: SearchRequest):
     """
-    자연어 쿼리를 받아 관련성이 높은 코드 스니펫을 찾고, 이를 기반으로 자연어 답변을 생성합니다.
+    자연어 쿼리를 받아 관련성이 높은 코드 컨텍스트를 찾고, 이를 기반으로 자연어 답변을 생성합니다.
     """
     
     # 1. 자연어 쿼리로 유사한 노드 ID를 찾습니다.
@@ -56,40 +56,22 @@ async def semantic_search_endpoint(request: SearchRequest):
         logger.warning("No similar code snippets found.")
         return "유사한 코드 스니펫을 찾을 수 없습니다. 다른 쿼리로 다시 시도해주세요."
         
-    # 2. 찾은 노드 ID로 Neo4j에서 실제 코드 스니펫을 가져옵니다.
+    # 2. 찾은 노드 ID로 Neo4j에서 실제 코드 컨텍스트(노드 + 릴레이션)를 가져옵니다.
     node_ids = [result["node_id"] for result in results_with_ids]
     try:
-        code_snippets_from_db = semantic_search_service.get_code_snippets_from_neo4j(node_ids)
-        logger.info(f"Fetched {len(code_snippets_from_db)} code snippets from Neo4j.")
+        # 변경된 함수 호출: get_code_snippets_from_neo4j -> get_rich_code_contexts_from_neo4j
+        code_contexts_from_db = semantic_search_service.get_rich_code_contexts_from_neo4j(node_ids)
+        logger.info(f"Fetched {len(code_contexts_from_db)} rich code contexts from Neo4j.")
     except RuntimeError as e:
-        logger.error(f"Failed to fetch code snippets from Neo4j: {e}")
+        logger.error(f"Failed to fetch code contexts from Neo4j: {e}")
         raise HTTPException(status_code=500, detail=str(e))
     
-    # 3. 임베딩 스코어와 코드 스니펫 정보를 합쳐 자연어 생성의 입력으로 만듭니다.
-    code_map = {result["node_id"]: result for result in results_with_ids}
-    final_results = []
-    
-    # 코드 스니펫이 존재하는지 확인하는 플래그
-    is_code_present = False
-    
-    for snippet_data in code_snippets_from_db:
-        node_id = snippet_data["node_id"]
-        score = code_map.get(node_id, {}).get("score", 0.0)
-        
-        # 실제 코드 스니펫이 있는지 확인
-        if snippet_data["code_snippet"].strip():
-            is_code_present = True
-            
-        final_results.append({
-            "score": score,
-            "file_path": snippet_data["file_path"],
-            "code_snippet": snippet_data["code_snippet"]
-        })
-    
-    # 4. LLM 모델을 사용하여 자연어 답변을 생성합니다.
-    if not final_results:
+    # 3. LLM 모델을 사용하여 자연어 답변을 생성합니다.
+    # LLM 서비스는 이제 노드와 릴레이션이 포함된 더 풍부한 데이터를 받게 됩니다.
+    if not code_contexts_from_db:
         return "유사한 코드는 찾았으나, 해당 코드를 추출하는 데 실패했습니다. 데이터베이스를 확인해주세요."
         
-    final_response = llm_service.generate_natural_language_response(request.query, final_results, is_code_present)
+    # generate_natural_language_response 함수도 새로운 데이터 구조를 처리하도록 수정해야 합니다.
+    final_response = llm_service.generate_natural_language_response(request.query, code_contexts_from_db)
     
     return final_response

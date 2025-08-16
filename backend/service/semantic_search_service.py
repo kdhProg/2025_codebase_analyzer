@@ -21,7 +21,6 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # CodeBERT 모델과 토크나이저를 애플리케이션 시작 시점에 한 번만 로드합니다.
-# 이렇게 하면 매번 호출할 때마다 모델을 로드하는 비효율을 방지할 수 있습니다.
 try:
     logger.info("CodeBERT 모델과 토크나이저 로드 시작...")
     tokenizer = AutoTokenizer.from_pretrained("microsoft/codebert-base")
@@ -36,7 +35,7 @@ except Exception as e:
 def search(query: str, top_k: int = 5) -> List[Dict[str, Any]]:
     """
     자연어 쿼리와 가장 유사한 코드 노드 ID를 찾습니다.
-    이 함수는 호출될 때마다 최신 임베딩 파일을 로드합니다.
+    (이 함수는 변경하지 않습니다.)
     """
     if tokenizer is None or model is None:
         logger.error("CodeBERT 모델 또는 토크나이저가 로드되지 않았습니다. 검색을 수행할 수 없습니다.")
@@ -59,16 +58,13 @@ def search(query: str, top_k: int = 5) -> List[Dict[str, Any]]:
         return []
     
     node_ids = list(embedding_dict.keys())
-    # pickle 파일의 값은 리스트이므로 텐서로 변환합니다.
     tensor_values = [torch.tensor(val) for val in embedding_dict.values()]
     code_embeddings = torch.stack(tensor_values)
 
-    # 쿼리를 임베딩으로 변환
     inputs = tokenizer(query, return_tensors="pt")
     with torch.no_grad():
         query_embedding = model(**inputs).pooler_output
 
-    # 코사인 유사도 계산
     cos_scores = torch.nn.functional.cosine_similarity(query_embedding, code_embeddings)
     top_results = torch.topk(cos_scores, k=min(top_k, len(code_embeddings)))
 
@@ -107,87 +103,99 @@ def _get_snippet_from_file(file_path: str, start_line: int, end_line: int) -> st
         return f"ERROR: 파일을 읽는 중 오류 발생: {e}"
 
 
-def get_code_snippets_from_neo4j(node_ids: List[str]) -> List[Dict[str, Any]]:
+def get_rich_code_contexts_from_neo4j(node_ids: List[str]) -> List[Dict[str, Any]]:
     """
-    Neo4j에서 주어진 노드 ID에 해당하는 코드의 파일 경로와 라인 정보를 가져와,
-    파일 시스템에서 실제 스니펫을 추출하여 반환합니다.
+    주어진 노드 ID에 대한 정보와, 해당 노드에 연결된 릴레이션 및 인접 노드를 함께 가져옵니다.
     """
-    code_snippets = []
+    code_contexts = []
     
-    # 1단계: start_line과 end_line이 존재하는 노드만 필터링하는 쿼리
-    query_with_lines = """
+    # 노드 ID를 통해 해당 노드와 인접한 모든 관계 및 노드를 찾는 Cypher 쿼리
+    # 이는 '유사하다고 판정된 노드'로부터 시작하는 1-hop 탐색입니다.
+    # r.id는 릴레이션의 고유 ID입니다.
+    query = """
         UNWIND $ids AS node_id
-        MATCH (n)
-        WHERE n.id = node_id AND n.file_path IS NOT NULL AND n.start_line IS NOT NULL AND n.end_line IS NOT NULL
+        MATCH (n)-[r]-(m)
+        WHERE n.id = node_id
         RETURN 
-            n.file_path AS file_path, 
-            n.start_line AS start_line, 
-            n.end_line AS end_line,
-            n.id AS node_id,
-            labels(n) AS labels
+            n.id AS main_node_id, 
+            n.file_path AS main_file_path,
+            n.start_line AS main_start_line,
+            n.end_line AS main_end_line,
+            labels(n) AS main_labels,
+            type(r) AS rel_type,
+            r.id AS rel_id,
+            m.id AS related_node_id,
+            labels(m) AS related_labels,
+            m.name AS related_node_name,
+            m.file_path AS related_file_path
     """
     
-    # 2단계: start_line과 end_line이 없는 노드에 대한 정보만 가져오는 쿼리
-    # 예를 들어, ExternalCallTarget, Module 같은 노드
-    query_without_lines = """
-        UNWIND $ids AS node_id
-        MATCH (n)
-        WHERE n.id = node_id AND (n.start_line IS NULL OR n.end_line IS NULL)
-        RETURN
-            n.id AS node_id,
-            labels(n) AS labels,
-            n.file_path AS file_path
-    """
-    
-    logger.info(f"get_code_snippets_from_neo4j: Neo4j 쿼리 실행 시도 - Query with lines: '{query_with_lines.strip()}', Params: '{node_ids}'")
+    logger.info(f"get_rich_code_contexts_from_neo4j: Neo4j 쿼리 실행 시도. Params: '{node_ids}'")
     
     try:
-        # 먼저, 라인 정보가 있는 노드를 검색하고 스니펫을 가져옵니다.
-        results_with_lines = run_cypher_query(query_with_lines, parameters={"ids": node_ids}, write=False)
+        results = run_cypher_query(query, parameters={"ids": node_ids}, write=False)
         
-        for record in results_with_lines:
-            node_id = record["node_id"]
-            file_path = record.get("file_path")
-            start_line = record.get("start_line")
-            end_line = record.get("end_line")
+        # 결과를 노드 ID별로 그룹화
+        grouped_results = {}
+        for record in results:
+            main_node_id = record["main_node_id"]
+            if main_node_id not in grouped_results:
+                grouped_results[main_node_id] = {
+                    "node_id": main_node_id,
+                    "file_path": record.get("main_file_path"),
+                    "start_line": record.get("main_start_line"),
+                    "end_line": record.get("main_end_line"),
+                    "type": record["main_labels"][0] if record["main_labels"] else "Unknown",
+                    "code_snippet": "",  # 나중에 채워질 값
+                    "relations": []
+                }
             
-            code_snippet = _get_snippet_from_file(file_path, start_line, end_line)
-            
-            code_snippets.append({
-                "node_id": node_id,
-                "file_path": file_path,
-                "code_snippet": code_snippet,
-                "type": record["labels"][0] if record["labels"] else "Unknown"
+            # 관계 정보 추가
+            grouped_results[main_node_id]["relations"].append({
+                "rel_type": record["rel_type"],
+                "rel_id": record["rel_id"],
+                "target_node_id": record["related_node_id"],
+                "target_node_name": record["related_node_name"],
+                "target_node_type": record["related_labels"][0] if record["related_labels"] else "Unknown",
+                "target_file_path": record.get("related_file_path")
             })
 
-        # 다음으로, 라인 정보가 없는 노드를 검색하고 정보만 반환합니다.
-        results_without_lines = run_cypher_query(query_without_lines, parameters={"ids": node_ids}, write=False)
-        
-        for record in results_without_lines:
-            node_id = record["node_id"]
-            file_path = record.get("file_path")
-            node_type = record["labels"][0] if record["labels"] else "Unknown"
-            
-            code_snippets.append({
-                "node_id": node_id,
-                "file_path": file_path,
-                "code_snippet": f"No code snippet available. This is a {node_type} node.",
-                "type": node_type
-            })
+        # 코드 스니펫 추출
+        for node_id, data in grouped_results.items():
+            if data["start_line"] is not None and data["end_line"] is not None and data["file_path"] is not None:
+                snippet = _get_snippet_from_file(data["file_path"], data["start_line"], data["end_line"])
+                data["code_snippet"] = snippet
+            else:
+                data["code_snippet"] = f"No code snippet available. This is a {data['type']} node."
+                
+            code_contexts.append(data)
 
-        if not code_snippets:
-            logger.warning(f"Neo4j 쿼리 결과가 비어 있습니다. 노드 ID {node_ids}에 해당하는 유효한 노드가 존재하지 않을 수 있습니다.")
-            return []
+        # 릴레이션이 없는 단독 노드 처리 (선택적으로 추가)
+        # 쿼리로 찾지 못한 노드 ID들을 따로 처리하여 결과에 포함
+        found_node_ids = set(grouped_results.keys())
+        not_found_ids = [id for id in node_ids if id not in found_node_ids]
+        if not_found_ids:
+            isolated_query = """
+                UNWIND $ids AS node_id
+                MATCH (n) WHERE n.id = node_id
+                RETURN n.id AS node_id, labels(n) AS labels, n.file_path AS file_path, n.start_line AS start_line, n.end_line AS end_line
+            """
+            isolated_results = run_cypher_query(isolated_query, parameters={"ids": not_found_ids}, write=False)
+            for record in isolated_results:
+                snippet = _get_snippet_from_file(record['file_path'], record['start_line'], record['end_line'])
+                code_contexts.append({
+                    "node_id": record['node_id'],
+                    "file_path": record['file_path'],
+                    "type": record["labels"][0] if record["labels"] else "Unknown",
+                    "code_snippet": snippet,
+                    "relations": []
+                })
 
-    except RuntimeError as e:
-        logger.error(f"Neo4j에서 코드 스니펫 정보를 가져오는 중 오류 발생: {e}")
-        raise
     except Exception as e:
-        logger.error(f"알 수 없는 오류가 발생했습니다: {e}", exc_info=True)
-        raise RuntimeError("알 수 없는 오류로 Neo4j 쿼리 실행 실패.")
-
-    return code_snippets
-
+        logger.error(f"Neo4j에서 풍부한 코드 컨텍스트를 가져오는 중 오류 발생: {e}", exc_info=True)
+        raise RuntimeError("Neo4j 쿼리 실행 실패.")
+        
+    return code_contexts
 
 def close_neo4j_driver():
     """애플리케이션 종료 시 Neo4j 드라이버를 닫습니다."""
