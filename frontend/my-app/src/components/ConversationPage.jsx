@@ -1,7 +1,7 @@
-// ConversationPage.jsx
+// ConversationPage.jsx (수정된 버전)
+
 import React, { useState, useEffect, useRef } from 'react';
-// axios 인스턴스를 임포트합니다. 이 파일은 프로젝트 루트나 api 디렉토리에 정의되어 있습니다.
-// 예: import apiClient from '../api/apiClient';
+// axios 인스턴스를 임포트합니다.
 import apiClient from '../config/apiClient'; 
 import '../css/ConversationPage.css';
 
@@ -41,14 +41,19 @@ function ConversationPage({ analysisSummary }) {
 
   // 시맨틱 검색 API를 호출하는 실제 함수
   const searchSemanticAPI = async (query) => {
-    // axios를 사용하여 POST 요청을 보냅니다.
-    // apiClient는 이미 'http://localhost:8000'과 같은 기본 URL이 설정되어 있다고 가정합니다.
-    const response = await apiClient.post('/semantic-search', {
-      query: query,
-      top_k: 5
-    });
-    // axios는 응답 데이터를 response.data에 담아 반환합니다.
-    return response.data;
+    // 백엔드에서 LLM이 생성한 문자열을 직접 반환하므로,
+    // 이 함수는 단순히 텍스트 응답을 받아서 반환하면 됩니다.
+    try {
+      const response = await apiClient.post('/semantic-search', {
+        query: query,
+        top_k: 10
+      });
+      return response.data; // 응답 데이터는 LLM의 문자열 응답입니다.
+    } catch (error) {
+      // API 호출 실패 시 에러를 던집니다.
+      console.error("API 호출 중 오류 발생:", error);
+      throw error;
+    }
   };
 
   // 메시지 전송 핸들러
@@ -62,30 +67,15 @@ function ConversationPage({ analysisSummary }) {
 
     try {
       // 시맨틱 검색 API 호출
-      const searchResults = await searchSemanticAPI(newUserMessage.text);
+      // 백엔드에서 문자열 응답을 받습니다.
+      const llmResponseText = await searchSemanticAPI(newUserMessage.text);
 
-      let newLLMMessage;
-
-      if (searchResults && searchResults.length > 0) {
-        // 가장 점수가 높은 첫 번째 결과를 가져옵니다.
-        const topResult = searchResults[0];
-
-        // LLM 응답 메시지 생성
-        newLLMMessage = {
-          sender: 'LLM',
-          text: '다음은 귀하의 질문과 가장 관련성이 높은 코드 스니펫입니다.',
-          evidence: {
-            title: `코드 스니펫: ${topResult.file_path} (점수: ${topResult.score.toFixed(2)})`,
-            snippet: topResult.code_snippet
-          }
-        };
-      } else {
-        // 검색 결과가 없는 경우
-        newLLMMessage = {
-          sender: 'LLM',
-          text: '죄송합니다. 프로젝트에서 해당 질문과 관련된 코드 스니펫을 찾지 못했습니다.'
-        };
-      }
+      // LLM 응답 메시지를 생성하고, 받은 텍스트를 그대로 사용합니다.
+      const newLLMMessage = {
+        sender: 'LLM',
+        text: llmResponseText, // 백엔드에서 받은 문자열을 그대로 사용
+        evidence: null // 더 이상 증거 코드를 백엔드에서 받지 않으므로 null로 설정
+      };
 
       setMessages(prevMessages => [...prevMessages, newLLMMessage]);
     } catch (error) {
@@ -93,7 +83,7 @@ function ConversationPage({ analysisSummary }) {
       // axios 에러는 error.response.data에 상세 정보가 있을 수 있습니다.
       const errorMessage = {
         sender: 'LLM',
-        text: `오류가 발생했습니다: ${error.message}. 다시 시도해 주세요.`
+        text: `오류가 발생했습니다. 다시 시도해 주세요.`
       };
       setMessages(prevMessages => [...prevMessages, errorMessage]);
     } finally {

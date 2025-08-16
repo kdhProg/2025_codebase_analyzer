@@ -114,7 +114,8 @@ def get_code_snippets_from_neo4j(node_ids: List[str]) -> List[Dict[str, Any]]:
     """
     code_snippets = []
     
-    query = """
+    # 1단계: start_line과 end_line이 존재하는 노드만 필터링하는 쿼리
+    query_with_lines = """
         UNWIND $ids AS node_id
         MATCH (n)
         WHERE n.id = node_id AND n.file_path IS NOT NULL AND n.start_line IS NOT NULL AND n.end_line IS NOT NULL
@@ -122,19 +123,29 @@ def get_code_snippets_from_neo4j(node_ids: List[str]) -> List[Dict[str, Any]]:
             n.file_path AS file_path, 
             n.start_line AS start_line, 
             n.end_line AS end_line,
-            n.id AS node_id
+            n.id AS node_id,
+            labels(n) AS labels
     """
     
-    logger.info(f"get_code_snippets_from_neo4j: Neo4j 쿼리 실행 시도 - Query: '{query.strip()}', Params: '{node_ids}'")
+    # 2단계: start_line과 end_line이 없는 노드에 대한 정보만 가져오는 쿼리
+    # 예를 들어, ExternalCallTarget, Module 같은 노드
+    query_without_lines = """
+        UNWIND $ids AS node_id
+        MATCH (n)
+        WHERE n.id = node_id AND (n.start_line IS NULL OR n.end_line IS NULL)
+        RETURN
+            n.id AS node_id,
+            labels(n) AS labels,
+            n.file_path AS file_path
+    """
+    
+    logger.info(f"get_code_snippets_from_neo4j: Neo4j 쿼리 실행 시도 - Query with lines: '{query_with_lines.strip()}', Params: '{node_ids}'")
     
     try:
-        results = run_cypher_query(query, parameters={"ids": node_ids}, write=False)
+        # 먼저, 라인 정보가 있는 노드를 검색하고 스니펫을 가져옵니다.
+        results_with_lines = run_cypher_query(query_with_lines, parameters={"ids": node_ids}, write=False)
         
-        if not results:
-            logger.warning(f"Neo4j 쿼리 결과가 비어 있습니다. 노드 ID {node_ids}에 해당하는 유효한 노드가 존재하지 않을 수 있습니다.")
-            return []
-
-        for record in results:
+        for record in results_with_lines:
             node_id = record["node_id"]
             file_path = record.get("file_path")
             start_line = record.get("start_line")
@@ -145,8 +156,29 @@ def get_code_snippets_from_neo4j(node_ids: List[str]) -> List[Dict[str, Any]]:
             code_snippets.append({
                 "node_id": node_id,
                 "file_path": file_path,
-                "code_snippet": code_snippet
+                "code_snippet": code_snippet,
+                "type": record["labels"][0] if record["labels"] else "Unknown"
             })
+
+        # 다음으로, 라인 정보가 없는 노드를 검색하고 정보만 반환합니다.
+        results_without_lines = run_cypher_query(query_without_lines, parameters={"ids": node_ids}, write=False)
+        
+        for record in results_without_lines:
+            node_id = record["node_id"]
+            file_path = record.get("file_path")
+            node_type = record["labels"][0] if record["labels"] else "Unknown"
+            
+            code_snippets.append({
+                "node_id": node_id,
+                "file_path": file_path,
+                "code_snippet": f"No code snippet available. This is a {node_type} node.",
+                "type": node_type
+            })
+
+        if not code_snippets:
+            logger.warning(f"Neo4j 쿼리 결과가 비어 있습니다. 노드 ID {node_ids}에 해당하는 유효한 노드가 존재하지 않을 수 있습니다.")
+            return []
+
     except RuntimeError as e:
         logger.error(f"Neo4j에서 코드 스니펫 정보를 가져오는 중 오류 발생: {e}")
         raise

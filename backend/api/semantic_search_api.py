@@ -5,17 +5,13 @@ from contextlib import asynccontextmanager
 from pydantic import BaseModel
 from typing import List, Dict, Any
 from service import semantic_search_service
+from service import llm_service
 import logging
 
-# Pydantic을 사용한 요청 및 응답 데이터 모델 정의
+# Pydantic을 사용한 요청 데이터 모델 정의
 class SearchRequest(BaseModel):
     query: str
     top_k: int = 5
-
-class SearchResult(BaseModel):
-    score: float
-    file_path: str
-    code_snippet: str
 
 # APIRouter 인스턴스 생성
 router = APIRouter()
@@ -40,16 +36,15 @@ async def lifespan(app: APIRouter):
     semantic_search_service.close_neo4j_driver()
 
 
-@router.post("/semantic-search", response_model=List[SearchResult])
+@router.post("/semantic-search", response_model=str)
 async def semantic_search_endpoint(request: SearchRequest):
     """
-    자연어 쿼리를 받아 관련성이 높은 코드 스니펫을 반환합니다.
+    자연어 쿼리를 받아 관련성이 높은 코드 스니펫을 찾고, 이를 기반으로 자연어 답변을 생성합니다.
     """
     
     # 1. 자연어 쿼리로 유사한 노드 ID를 찾습니다.
     logger.info(f"Received query: '{request.query}' with top_k={request.top_k}")
     
-    # NOTE: semantic_search_service.py 변경에 따라 searcher 객체 대신 함수를 직접 호출
     try:
         results_with_ids = semantic_search_service.search(request.query, top_k=request.top_k)
         logger.info(f"Found {len(results_with_ids)} similar node IDs from CodeBERT.")
@@ -59,7 +54,7 @@ async def semantic_search_endpoint(request: SearchRequest):
 
     if not results_with_ids:
         logger.warning("No similar code snippets found.")
-        return []
+        return "유사한 코드 스니펫을 찾을 수 없습니다. 다른 쿼리로 다시 시도해주세요."
         
     # 2. 찾은 노드 ID로 Neo4j에서 실제 코드 스니펫을 가져옵니다.
     node_ids = [result["node_id"] for result in results_with_ids]
@@ -70,26 +65,31 @@ async def semantic_search_endpoint(request: SearchRequest):
         logger.error(f"Failed to fetch code snippets from Neo4j: {e}")
         raise HTTPException(status_code=500, detail=str(e))
     
-    # 3. 임베딩 스코어와 코드 스니펫 정보를 합쳐 최종 결과를 만듭니다.
+    # 3. 임베딩 스코어와 코드 스니펫 정보를 합쳐 자연어 생성의 입력으로 만듭니다.
     code_map = {result["node_id"]: result for result in results_with_ids}
-    
     final_results = []
+    
+    # 코드 스니펫이 존재하는지 확인하는 플래그
+    is_code_present = False
+    
     for snippet_data in code_snippets_from_db:
         node_id = snippet_data["node_id"]
         score = code_map.get(node_id, {}).get("score", 0.0)
-        final_results.append(
-            SearchResult(
-                score=score,
-                file_path=snippet_data["file_path"],
-                code_snippet=snippet_data["code_snippet"]
-            )
-        )
+        
+        # 실제 코드 스니펫이 있는지 확인
+        if snippet_data["code_snippet"].strip():
+            is_code_present = True
+            
+        final_results.append({
+            "score": score,
+            "file_path": snippet_data["file_path"],
+            "code_snippet": snippet_data["code_snippet"]
+        })
     
-    # --- 디버깅을 위해 final_results 내용 출력 ---
-    print("--- [DEBUGGING] final_results 내용 ---")
-    for i, result in enumerate(final_results):
-        print(f"Result {i+1} | File Path: {result.file_path}, Score: {result.score:.4f}")
-    print("--- [DEBUGGING] final_results 종료 ---")
-    # ----------------------------------------------------
+    # 4. LLM 모델을 사용하여 자연어 답변을 생성합니다.
+    if not final_results:
+        return "유사한 코드는 찾았으나, 해당 코드를 추출하는 데 실패했습니다. 데이터베이스를 확인해주세요."
+        
+    final_response = llm_service.generate_natural_language_response(request.query, final_results, is_code_present)
     
-    return final_results
+    return final_response

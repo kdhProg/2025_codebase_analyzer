@@ -33,7 +33,7 @@ def get_all_nodes_with_enriched_text():
     print("임베딩을 위해 Neo4j에서 노드와 관계를 가져오는 중...")
     try:
         results = run_cypher_query(cypher_query, write=False)
-        print(f'Debug | ai_data_pipeline results >>>>> {results}')
+        # print(f'Debug | ai_data_pipeline results >>>>> {results}')
         nodes_list = []
         for record in results:
             node_id = record['id']

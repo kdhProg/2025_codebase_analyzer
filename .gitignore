@@ -31,3 +31,6 @@ __pycache__/
 
 # python pkl
 *.pkl
+
+# private env keys
+*.env
