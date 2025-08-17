@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 // axios 인스턴스를 임포트합니다.
 import apiClient from '../config/apiClient';
 import '../css/ConversationPage.css';
-
+import ReactMarkdown from 'react-markdown';
 
 
 
@@ -139,7 +139,7 @@ function ConversationPage({ analysisSummary }) {
                     <div className="chat-window" ref={chatWindowRef}>
                         {messages.map((message, index) => (
                             <div key={index} className={`chat-bubble ${message.sender}`}>
-                                <p>{message.text}</p>
+                                <ReactMarkdown>{message.text}</ReactMarkdown>
                             </div>
                         ))}
                         {isLoading && (

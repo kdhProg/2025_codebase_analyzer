@@ -85,6 +85,7 @@ body {
 .profile-name {
     font-size: 1.1rem;
     font-weight: 600;
+    color: white;
 }
 
 .sidebar-nav {
@@ -202,28 +203,51 @@ body {
 
 .chat-bubble {
   display: flex;
+  flex-direction: column;
   align-items: flex-start;
   gap: 10px;
   max-width: 75%;
 }
 
+.chat-bubble {
+  color: white;
+}
+
+.chat-bubble code,
+.chat-bubble pre,
+.chat-bubble a,
+.chat-bubble strong,
+.chat-bubble em,
+.chat-bubble blockquote,
+.chat-bubble hr,
+.chat-bubble img {
+  color: rgb(255, 74, 201);
+}
+
 .chat-bubble.user {
   align-self: flex-end;
   flex-direction: row-reverse;
+  
 }
 
 .chat-bubble.user p {
     background-color: var(--primary-color);
     color: white;
     border-bottom-right-radius: 8px;
+
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .chat-bubble.LLM {
   align-self: flex-start;
+
+  background-color: var(--chat-bg-llm);
+  border-radius: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .chat-bubble.LLM p {
-    background-color: var(--chat-bg-llm);
+    /* background-color: var(--chat-bg-llm); */
     color: white;
     border-bottom-left-radius: 8px;
 }
@@ -233,7 +257,7 @@ body {
     border-radius: 20px;
     word-wrap: break-word;
     line-height: 1.5;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); */
     margin: 0;
 }
 
