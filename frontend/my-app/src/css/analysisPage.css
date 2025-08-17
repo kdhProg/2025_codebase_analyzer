@@ -33,7 +33,7 @@
 
 /* 텍스트 스타일 */
 .analysis-title {
-    color: #a0c9f1;
+    color: #e4edf6;
     font-size: 2.5em;
     margin: 0;
 }
@@ -75,7 +75,7 @@
 
 .analysis-container .progress-bar {
     height: 100%;
-    background-color: #e93030;
+    background-color: #53acd9;
     transition: width 0.5s ease-out;
     border-radius: 12px;
     display: flex;

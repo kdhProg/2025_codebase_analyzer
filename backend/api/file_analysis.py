@@ -111,10 +111,10 @@ async def analyze_selected_code_stream_endpoint(request: CodeAnalysisRequest):
                 "total_files_for_analysis": total_files,
                 "analyzed_files_details": analysis_summary_details
             }
-            yield f"data: {json.dumps({'status': 'completed', 'analysis_summary': final_summary, 'progress': file_analysis_progress})}\n\n"
+            yield f"data: {json.dumps({'status': 'in_progress', 'analysis_summary': final_summary, 'progress': file_analysis_progress})}\n\n"
 
             # 3. 임베딩 파이프라인 실행
-            yield f"data: {json.dumps({'status': 'info', 'message': '코드 임베딩 생성 시작...', 'progress': file_analysis_progress})}\n\n"
+            yield f"data: {json.dumps({'status': 'in_progress', 'analysis_summary': '코드 임베딩 생성 시작...', 'progress': 0})}\n\n"
 
             # 비동기 콜백 함수 정의 (yield를 사용하여 프론트엔드에 메시지 전달)
             def embedding_progress_callback(message: Dict[str, Any]):
@@ -130,7 +130,7 @@ async def analyze_selected_code_stream_endpoint(request: CodeAnalysisRequest):
                 project_root_path=request.project_root_path
             )
 
-            yield f"data: {json.dumps({'status': 'info', 'message': '임베딩 생성 완료.', 'progress': 100})}\n\n"
+            yield f"data: {json.dumps({'status': 'completed', 'analysis_summary': '임베딩 생성 완료.', 'progress': 100})}\n\n"
 
 
         except HTTPException as he:
