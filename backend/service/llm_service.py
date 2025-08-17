@@ -15,6 +15,22 @@ API_KEY = os.getenv("GEMINI_API_KEY")
 # API 호출 URL
 API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent"
 
+def load_prompt_template(file_path: str) -> str:
+    """
+    지정된 파일 경로에서 프롬프트 템플릿을 읽어와 문자열로 반환합니다.
+    """
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            return f.read()
+    except FileNotFoundError:
+        logger.error(f"프롬프트 템플릿 파일이 존재하지 않습니다: {file_path}")
+        return ""
+    except Exception as e:
+        logger.error(f"프롬프트 템플릿 파일을 읽는 중 오류 발생: {e}")
+        return ""
+
+
+
 def generate_natural_language_response(query: str, contexts: List[Dict[str, Any]]) -> str:
     """
     사용자 쿼리와 코드 컨텍스트(노드 및 릴레이션 정보)를 기반으로 Gemini API를 사용하여 자연어 답변을 생성합니다.
@@ -22,6 +38,13 @@ def generate_natural_language_response(query: str, contexts: List[Dict[str, Any]
     if not API_KEY:
         logger.error("GEMINI_API_KEY 환경 변수가 설정되지 않았습니다. 답변을 생성할 수 없습니다.")
         return "API 키가 없어 답변을 생성할 수 없습니다. 시스템 관리자에게 문의해주세요."
+    
+    # 외부 파일에서 기본 프롬프트 템플릿을 불러옵니다.
+    prompt_file_path = "./ai_instructions/LLM_prompt.txt"
+    base_prompt = load_prompt_template(prompt_file_path)
+
+    if not base_prompt:
+        return "프롬프트 템플릿을 불러오는 데 실패했습니다. 시스템 관리자에게 문의해주세요."
 
     logger.info("Gemini API에 요청 전송 중...")
 

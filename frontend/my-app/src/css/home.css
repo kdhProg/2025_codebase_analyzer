@@ -2,13 +2,18 @@
 .home-entire-container {
   padding: 40px;
   min-height: 100vh;
-  background-color: #1e1e1e;
   font-family: 'Fira Code', 'Roboto Mono', monospace;
   color: #cccccc;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 30px;
+
+  /* background-color: #1e1e1e; */
+  background-image: url('../assets/chat_bg_1.webp');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
 }
 
 .home-entire-container > div {

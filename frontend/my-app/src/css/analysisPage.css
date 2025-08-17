@@ -1,6 +1,5 @@
 
 .analysis-container {
-    background-color: #2e2e2e;
     color: #e0e0e0;
     text-align: center;
     padding: 50px;
@@ -11,6 +10,12 @@
     align-items: center;
     font-family: 'Inter', sans-serif;
     gap: 1.5em;
+
+    /* background-color: #2e2e2e; */
+    background-image: url('../assets/chat_bg_1.webp');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
 }
 
 .analyzing-container {
