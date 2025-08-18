@@ -80,8 +80,10 @@ const Header = () => {
                     <h1>Codebase Insight</h1>
                 </div>
                 <div className={`menu-section ${isMenuOpen ? '' : 'hidden'}`}>
-                    <p>프로젝트</p>
-                    <p>대화</p>
+                    <p onClick={() => window.location.href = '/'}>홈</p>
+                    <p onClick={() => window.location.href = '/code-interpretation'}>코드 해석</p>
+                    <p onClick={() => window.location.href = '/project-analysis'}>프로젝트 분석</p>
+                    {/* <p onClick={() => window.location.href = '/conversation'}>대화</p> */}
                 </div>
                 <div className="toggle-button-section">
                     <button

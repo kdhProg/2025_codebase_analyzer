@@ -1,0 +1,142 @@
+.file-tree-container {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+}
+
+.file-tree-container h3 {
+  margin: 0 0 20px 0;
+  color: #333;
+  font-size: 1.5em;
+}
+
+.tree-controls {
+  margin-bottom: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+.control-button {
+  background: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.control-button:hover {
+  background: #e0e0e0;
+  border-color: #ccc;
+}
+
+.file-tree {
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 20px;
+  background: #fafafa;
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.tree-node {
+  margin: 5px 0;
+}
+
+.node-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.node-content:hover {
+  background-color: #f0f0f0;
+}
+
+.expand-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  color: #666;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  transition: background-color 0.2s;
+}
+
+.expand-button:hover {
+  background-color: #e0e0e0;
+}
+
+.expand-button.hidden {
+  visibility: hidden;
+}
+
+.node-icon {
+  font-size: 16px;
+  width: 20px;
+  text-align: center;
+}
+
+.node-name {
+  font-weight: 500;
+  color: #333;
+  flex: 1;
+}
+
+.node-info {
+  display: flex;
+  gap: 10px;
+  font-size: 12px;
+  color: #666;
+}
+
+.file-path {
+  background: #f0f0f0;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: monospace;
+}
+
+.node-children {
+  margin-left: 20px;
+  border-left: 2px solid #e0e0e0;
+  padding-left: 15px;
+}
+
+.no-data {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+  font-style: italic;
+}
+
+/* 스크롤바 스타일링 */
+.file-tree::-webkit-scrollbar {
+  width: 8px;
+}
+
+.file-tree::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.file-tree::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.file-tree::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+

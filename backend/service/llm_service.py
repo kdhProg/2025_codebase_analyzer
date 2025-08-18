@@ -101,6 +101,7 @@ def generate_natural_language_response(query: str, contexts: List[Dict[str, Any]
                         f"**대상 유형:** {rel.get('target_node_type', 'N/A')}"
                     )
             user_content += "\n---"
+            
 
     try:
         payload = {
@@ -112,12 +113,29 @@ def generate_natural_language_response(query: str, contexts: List[Dict[str, Any]
         response = requests.post(f"{API_URL}?key={API_KEY}", json=payload)
         response.raise_for_status()
         
-        result = response.json()
+        # JSON 디코딩 오류를 안전하게 처리
+        try:
+            result = response.json()
+        except json.JSONDecodeError as e:
+            logger.error(f"Gemini API 응답 JSON 디코딩 오류: {e}. 원본 텍스트: {response.text}")
+            return {"response": "API 응답 형식이 올바르지 않습니다. 다시 시도해 주세요.", "status": "error"}
 
-        response_text = result["candidates"][0]["content"]["parts"][0]["text"]
-        
-        logger.info("API 답변 성공적으로 수신.")
-        return response_text
+        # API 응답 구조의 'KeyError'를 안전하게 처리
+        if "candidates" in result and result["candidates"] and \
+           "content" in result["candidates"][0] and \
+           "parts" in result["candidates"][0]["content"] and \
+           result["candidates"][0]["content"]["parts"]:
+            
+            # parts 리스트의 첫 번째 요소가 'text' 키를 가지고 있는지 확인
+            part = result["candidates"][0]["content"]["parts"][0]
+            if "text" in part:
+                response_text = part["text"]
+                logger.info("API 답변 성공적으로 수신.")
+                return response_text
+
+        # 예상치 못한 응답 형식일 경우
+        logger.error(f"예상치 못한 Gemini API 응답 형식: {json.dumps(result, indent=2)}")
+        return {"response": "알 수 없는 API 응답이 도착했습니다. 다시 시도해 주세요.", "status": "error"}
 
     except requests.exceptions.HTTPError as err:
         logger.error(f"HTTP 오류 발생: {err}", exc_info=True)

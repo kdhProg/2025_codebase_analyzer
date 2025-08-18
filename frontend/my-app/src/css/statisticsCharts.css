@@ -1,0 +1,179 @@
+.statistics-charts-container {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+}
+
+.statistics-charts-container h3 {
+  margin: 0 0 20px 0;
+  color: #333;
+  font-size: 1.5em;
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.chart-card {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 20px;
+  border: 1px solid #e9ecef;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.chart-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.chart-card h4 {
+  margin: 0 0 15px 0;
+  color: #495057;
+  font-size: 1.2em;
+  text-align: center;
+}
+
+.summary-stats {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 20px;
+  border: 1px solid #e9ecef;
+}
+
+.summary-stats h4 {
+  margin: 0 0 15px 0;
+  color: #495057;
+  font-size: 1.2em;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #dee2e6;
+}
+
+.stat-label {
+  font-weight: 500;
+  color: #6c757d;
+}
+
+.stat-value {
+  font-weight: 600;
+  color: #495057;
+  font-size: 1.1em;
+}
+
+/* 차트 컨테이너 반응형 처리 */
+@media (max-width: 768px) {
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .chart-card {
+    min-height: 300px;
+  }
+}
+
+/* 차트 내부 요소들 스타일링 */
+.recharts-wrapper {
+  margin: 0 auto;
+}
+
+.recharts-pie-label-text {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.recharts-bar-rectangle {
+  transition: opacity 0.2s;
+}
+
+.recharts-bar-rectangle:hover {
+  opacity: 0.8;
+}
+
+.recharts-tooltip-wrapper {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.recharts-tooltip-content {
+  padding: 8px 12px;
+}
+
+.recharts-tooltip-label {
+  font-weight: 600;
+  color: #333;
+}
+
+.recharts-tooltip-item {
+  color: #666;
+}
+
+/* 차트 색상 테마 */
+.chart-card:nth-child(1) .recharts-pie {
+  --chart-primary: #0088FE;
+}
+
+.chart-card:nth-child(2) .recharts-bar {
+  --chart-primary: #00C49F;
+}
+
+.chart-card:nth-child(3) .recharts-bar {
+  --chart-primary: #FFBB28;
+}
+
+.chart-card:nth-child(4) .recharts-pie {
+  --chart-primary: #FF8042;
+}
+
+/* 로딩 상태 */
+.chart-card.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+}
+
+.chart-card.loading::after {
+  content: "차트 로딩 중...";
+  color: #6c757d;
+  font-style: italic;
+}
+
+/* 빈 데이터 상태 */
+.chart-card.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+}
+
+.chart-card.empty::after {
+  content: "표시할 데이터가 없습니다";
+  color: #6c757d;
+  font-style: italic;
+}
+

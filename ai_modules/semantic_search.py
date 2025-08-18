@@ -46,19 +46,19 @@ class SemanticSearcher:
         return results
     
 # 테스트용 메인 실행 블록
-if __name__ == "__main__":
-    embedding_file = "data/embeddings.pkl"
-    if not os.path.exists(embedding_file):
-        print(f"'{embedding_file}'을 찾을 수 없습니다. 먼저 data_pipeline.py를 실행하세요.")
-    else:
-        searcher = SemanticSearcher(embedding_file_path=embedding_file)
+# if __name__ == "__main__":
+#     embedding_file = "data/embeddings.pkl"
+#     if not os.path.exists(embedding_file):
+#         print(f"'{embedding_file}'을 찾을 수 없습니다. 먼저 data_pipeline.py를 실행하세요.")
+#     else:
+#         searcher = SemanticSearcher(embedding_file_path=embedding_file)
         
-        # 테스트 검색
-        test_query = "FastAPI 애플리케이션 실행"
-        search_results = searcher.search(test_query)
+#         # 테스트 검색
+#         test_query = "FastAPI 애플리케이션 실행"
+#         search_results = searcher.search(test_query)
         
-        print("\n--- 검색 결과 ---")
-        for result in search_results:
-            print(f"Node ID: {result['node_id']}, 유사도: {result['score']:.4f}")
+#         print("\n--- 검색 결과 ---")
+#         for result in search_results:
+#             print(f"Node ID: {result['node_id']}, 유사도: {result['score']:.4f}")
 
         
