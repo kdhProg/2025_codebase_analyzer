@@ -93,8 +93,8 @@ const ProjectAnalysis = () => {
   return (
     <div className="project-analysis-container">
       <div className="analysis-header">
-        <h2>��️ 프로젝트 구조 시각화</h2>
-        <p>프로젝트 경로를 입력하면 파일 구조와 통계를 시각적으로 분석해드립니다</p>
+        <h2>프로젝트 구조 시각화</h2>
+        <p>경로 기반 파일 구조와 통계를 시각적으로 분석</p>
       </div>
 
       <div className="input-section">
@@ -105,7 +105,7 @@ const ProjectAnalysis = () => {
             type="text"
             value={projectPath}
             onChange={handleProjectPathChange}
-            placeholder="C:\Users\Username\Projects\my-project 또는 /home/user/projects/my-project"
+            placeholder="C:\Users\Username\Projects\my-project"
             className="project-path-input"
             disabled={isAnalyzing}
           />
@@ -171,10 +171,10 @@ const ProjectAnalysis = () => {
             disabled={isAnalyzing || !projectPath.trim()}
             className="analyze-button"
           >
-            {isAnalyzing ? '🔄 분석 중...' : '🚀 프로젝트 분석'}
+            {isAnalyzing ? '🔄 분석 중...' : '프로젝트 분석'}
           </button>
           <button onClick={clearAll} className="clear-button">
-            🗑️ 초기화
+            초기화
           </button>
         </div>
       </div>
