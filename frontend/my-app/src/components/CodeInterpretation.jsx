@@ -109,8 +109,7 @@ const CodeInterpretation = () => {
   return (
     <div className="code-interpretation-container">
       <div className="interpretation-header">
-        <h2>🔍 코드 해석기</h2>
-        <p>코드를 입력하면 AI가 분석하고 해석해드립니다</p>
+        <h2>코드 해석</h2>
       </div>
 
       <div className="input-section">
@@ -160,11 +159,11 @@ const CodeInterpretation = () => {
 
       {result && (
         <div className="results-section">
-          <h3>✅ 분석 결과</h3>
+          <h3>분석 결과</h3>
           
           {/* 해석 결과 */}
           <div className="interpretation-result">
-            <h4>📝 코드 해석</h4>
+            <h4>코드 해석</h4>
             <div className="interpretation-content">
               {result.interpretation.split('\n').map((line, index) => {
                 if (line.startsWith('##')) {
@@ -182,10 +181,10 @@ const CodeInterpretation = () => {
           </div>
 
           {/* 코드 구조 */}
-          {formatCodeStructure(result.code_structure)}
+          {/* {formatCodeStructure(result.code_structure)} */}
 
           {/* 유사한 코드 예제 */}
-          {result.similar_code_examples && result.similar_code_examples.length > 0 && (
+          {/* {result.similar_code_examples && result.similar_code_examples.length > 0 && (
             <div className="similar-code-section">
               <h4>🔗 유사한 코드 패턴</h4>
               <div className="similar-code-list">
@@ -205,7 +204,7 @@ const CodeInterpretation = () => {
                 ))}
               </div>
             </div>
-          )}
+          )} */}
 
           {/* 개선 제안 */}
           {result.suggestions && result.suggestions.length > 0 && (

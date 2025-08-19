@@ -27,7 +27,7 @@ app.include_router(file_scan.router)
 app.include_router(file_analysis.router)
 app.include_router(semantic_search_api.router)
 app.include_router(graph.router)
-# app.include_router(code_interpretation.router)
+app.include_router(code_interpretation.router)
 
 @app.get("/")
 async def read_root():

@@ -41,7 +41,7 @@
 
 /* 메시지 스타일 */
 .loading-message, .instruction-message {
-  color: #999999;
+  color: #ffffff;
   font-style: normal;
 }
 
