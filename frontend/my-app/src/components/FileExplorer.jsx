@@ -69,7 +69,7 @@ function FileNodeItem({ node, onToggleCheck, isCheckedMap }) {
                 >
                     {getIcon()} {node.name}
                     {node.is_excluded_by_default && (
-                        <span className="excluded-label">(기본 제외)</span>
+                        <span className="excluded-label">(Excluded by default)</span>
                     )}
                 </span>
             </div>
@@ -182,7 +182,7 @@ function FileExplorer({ node, projectRootPath, onAnalyze }) {
     };
 
     if (!node || !node.children) {
-        return <p>스캔된 파일 구조가 없음</p>;
+        return <p>No scanned file structure</p>;
     }
 
     return (
@@ -197,7 +197,7 @@ function FileExplorer({ node, projectRootPath, onAnalyze }) {
                 onClick={handleAnalyzeClick}
                 className="analyze-button"
             >
-                선택 완료 및 분석 시작
+                Confirm Selection & Start Analysis
             </button>
         </div>
     );

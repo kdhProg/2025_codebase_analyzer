@@ -1,11 +1,11 @@
 import { useState } from 'react';
 
-// CSS를 컴포넌트 내부에 직접 정의하여 파일 경로 오류를 방지합니다.
+// Define CSS directly inside the component to prevent file path errors
 const Header = () => {
-    // 메뉴가 펼쳐져 있는지 여부를 관리하는 상태
+    // State to manage whether the menu is open
     const [isMenuOpen, setIsMenuOpen] = useState(true);
 
-    // 버튼 클릭 시 상태를 토글하는 함수
+    // Function to toggle the menu state on button click
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
     };
@@ -24,7 +24,7 @@ const Header = () => {
                     padding: 0 50px;
                     min-width: 1000px;
                     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
-                    position: relative; /* 자식 요소의 위치를 위해 추가 */
+                    position: relative; /* Added for child element positioning */
                 }
 
                 .logo-section h1 {
@@ -43,7 +43,7 @@ const Header = () => {
                 
                 .menu-section.hidden {
                     opacity: 0;
-                    pointer-events: none; /* 클릭 이벤트 방지 */
+                    pointer-events: none; /* Prevent click events */
                 }
 
                 .menu-section p {
@@ -66,7 +66,7 @@ const Header = () => {
                     cursor: pointer;
                     transition: color 0.3s, transform 0.3s;
                     padding: 0;
-                    margin-left: 20px; /* 메뉴와 버튼 간 간격 */
+                    margin-left: 20px; /* Spacing between menu and button */
                 }
 
                 .toggle-button:hover {
@@ -80,10 +80,10 @@ const Header = () => {
                     <h1>Codebase Insight</h1>
                 </div>
                 <div className={`menu-section ${isMenuOpen ? '' : 'hidden'}`}>
-                    <p onClick={() => window.location.href = '/'}>홈</p>
-                    <p onClick={() => window.location.href = '/code-interpretation'}>코드 해석</p>
-                    <p onClick={() => window.location.href = '/project-analysis'}>프로젝트 분석</p>
-                    {/* <p onClick={() => window.location.href = '/conversation'}>대화</p> */}
+                    <p onClick={() => window.location.href = '/'}>Home</p>
+                    <p onClick={() => window.location.href = '/code-interpretation'}>Code Interpretation</p>
+                    <p onClick={() => window.location.href = '/project-analysis'}>Project Analysis</p>
+                    {/* <p onClick={() => window.location.href = '/conversation'}>Conversation</p> */}
                 </div>
                 <div className="toggle-button-section">
                     <button

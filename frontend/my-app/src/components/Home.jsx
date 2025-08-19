@@ -8,10 +8,10 @@ import AnalysisPage from '../components/AnalysisPage';
 import ConversationPage from '../components/ConversationPage';
 
 function Home() {
-    // 앱의 현재 단계 상태 관리
+    // Manage current app stage state
     const [appStage, setAppStage] = useState('initial_scan');
 
-    // 디렉토리 스캔 및 분석 관련 상태
+    // Directory scan and analysis related state
     const [scannedTree, setScannedTree] = useState(null);
     const [currentProjectRootPath, setCurrentProjectRootPath] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -19,7 +19,7 @@ function Home() {
     const [selectedAnalysisPaths, setSelectedAnalysisPaths] = useState([]);
     const [finalAnalysisSummary, setFinalAnalysisSummary] = useState(null);
 
-    // 디버깅/테스트 전용: 더미 분석 요약 데이터
+    // Debug/Test only: dummy analysis summary data
     const dummySummary = {
         total_files: 15,
         main_language: "JavaScript",
@@ -42,7 +42,7 @@ function Home() {
             setError(null);
             setAppStage('file_selection');
         } else {
-            setError("스캔 결과 형식이 올바르지 않습니다. 다시 시도해 주세요.");
+            setError("The scan result format is invalid. Please try again.");
             setScannedTree(null);
             setCurrentProjectRootPath('');
             setAppStage('error_display');
@@ -80,11 +80,11 @@ function Home() {
     }, []);
 
     const handleAnalysisError = useCallback((errorMessage) => {
-        setError(errorMessage || "코드 분석 중 알 수 없는 오류가 발생했습니다.");
+        setError(errorMessage || "An unknown error occurred during code analysis.");
         setAppStage('error_display');
     }, []);
 
-    // 디버깅용 핸들러: 분석 과정을 건너뛰고 바로 대화 페이지로 이동
+    // Debug handler: skip analysis process and go directly to conversation page
     const handleSkipToConversation = () => {
         setFinalAnalysisSummary(dummySummary);
         setAppStage('conversation');
@@ -94,18 +94,18 @@ function Home() {
         case 'initial_scan':
             return (
                 <div className="home-entire-container">
-                    <h1>코드베이스 탐색</h1>
+                    <h1>Codebase Explorer</h1>
                     <DirectorySelector
                         onScanResult={handleScanResult}
                         onLoadingChange={handleDirectorySelectorLoadingChange}
                         onError={handleDirectorySelectorError}
                     />
-                    {isLoading && <p className="loading-message">파일 구조를 스캔 중입니다. 잠시만 기다려 주세요...</p>}
-                    {error && <p className="error-message">오류: {error}</p>}
+                    {isLoading && <p className="loading-message">Scanning file structure. Please wait...</p>}
+                    {error && <p className="error-message">Error: {error}</p>}
                     {!isLoading && !error && !scannedTree && (
-                        <p className="instruction-message">시작하려면 위에서 프로젝트 디렉토리를 선택하세요.</p>
+                        <p className="instruction-message">To get started, select a project directory above.</p>
                     )}
-                    {/* 디버깅/테스트 전용 버튼 */}
+                    {/* Debug/Test only button */}
                     <button
                         onClick={handleSkipToConversation}
                         style={{
@@ -121,7 +121,7 @@ function Home() {
                             cursor: 'pointer',
                         }}
                     >
-                        테스트: 스킵
+                        Test: Skip
                     </button>
                 </div>
             );
@@ -129,14 +129,14 @@ function Home() {
         case 'file_selection':
             return (
                 <div className="home-entire-container">
-                    <h1>코드베이스 탐색</h1>
+                    <h1>Codebase Explorer</h1>
                     <DirectorySelector
                         onScanResult={handleScanResult}
                         onLoadingChange={handleDirectorySelectorLoadingChange}
                         onError={handleDirectorySelectorError}
                     />
                     <hr className="separator" />
-                    <h2>탐색 범위 설정</h2>
+                    <h2>Set Exploration Scope</h2>
                     {scannedTree && currentProjectRootPath ? (
                         <FileExplorer
                             node={scannedTree}
@@ -144,7 +144,7 @@ function Home() {
                             onAnalyze={handleStartAnalysisFromExplorer}
                         />
                     ) : (
-                        <p className="loading-message">파일 구조를 로드 중입니다...</p>
+                        <p className="loading-message">Loading file structure...</p>
                     )}
                 </div>
             );
@@ -169,7 +169,7 @@ function Home() {
         case 'error_display':
             return (
                 <div className="error-page-container">
-                    <h2>오류 발생!</h2>
+                    <h2>Error occurred!</h2>
                     <p>{error}</p>
                     <button
                         onClick={() => {
@@ -181,13 +181,13 @@ function Home() {
                         }}
                         className="error-retry-button"
                     >
-                        재시도
+                        Retry
                     </button>
                 </div>
             );
 
         default:
-            return <p className="error-message">알 수 없는 애플리케이션 상태입니다.</p>;
+            return <p className="error-message">Unknown application state.</p>;
     }
 }
 

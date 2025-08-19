@@ -18,7 +18,7 @@ const CodeInterpretation = () => {
 
   const interpretCode = async () => {
     if (!codeInput.trim()) {
-      setError('코드를 입력해주세요.');
+      setError('Please enter the code.');
       return;
     }
 
@@ -47,7 +47,7 @@ const CodeInterpretation = () => {
       const data = await response.json();
       setResult(data);
     } catch (err) {
-      setError(`코드 해석 중 오류가 발생했습니다: ${err.message}`);
+      setError(`An error occurred while interpreting the code: ${err.message}`);
       console.error('Code interpretation error:', err);
     } finally {
       setIsLoading(false);
@@ -62,22 +62,22 @@ const CodeInterpretation = () => {
 
   const formatCodeStructure = (structure) => {
     if (!structure || structure.error) {
-      return <p className="error-text">구조 분석 실패: {structure?.error}</p>;
+      return <p className="error-text">Structure analysis failed: {structure?.error}</p>;
     }
 
     return (
       <div className="structure-info">
-        <h4>📊 코드 구조</h4>
+        <h4>📊 Code Structure</h4>
         <div className="structure-stats">
-          <span className="stat-item">함수: {structure.functions?.length || 0}개</span>
-          <span className="stat-item">클래스: {structure.classes?.length || 0}개</span>
-          <span className="stat-item">변수: {structure.variables?.length || 0}개</span>
-          <span className="stat-item">임포트: {structure.imports?.length || 0}개</span>
+          <span className="stat-item">Functions: {structure.functions?.length || 0}</span>
+          <span className="stat-item">Classes: {structure.classes?.length || 0}</span>
+          <span className="stat-item">Variables: {structure.variables?.length || 0}</span>
+          <span className="stat-item">Imports: {structure.imports?.length || 0}</span>
         </div>
         
         {structure.functions && structure.functions.length > 0 && (
           <div className="entity-list">
-            <h5>🔧 함수들:</h5>
+            <h5>🔧 Functions:</h5>
             <ul>
               {structure.functions.slice(0, 5).map((func, index) => (
                 <li key={index}>
@@ -91,7 +91,7 @@ const CodeInterpretation = () => {
 
         {structure.classes && structure.classes.length > 0 && (
           <div className="entity-list">
-            <h5>📦 클래스들:</h5>
+            <h5>📦 Classes:</h5>
             <ul>
               {structure.classes.slice(0, 5).map((cls, index) => (
                 <li key={index}>
@@ -109,7 +109,7 @@ const CodeInterpretation = () => {
   return (
     <div className="code-interpretation-container">
       <div className="interpretation-header">
-        <h2>코드 해석</h2>
+        <h2>Code Interpretation</h2>
       </div>
 
       <div className="input-section">
@@ -129,13 +129,13 @@ const CodeInterpretation = () => {
             disabled={isLoading || !codeInput.trim()}
             className="interpret-button"
           >
-            {isLoading ? '🔄 분석 중...' : '🚀 코드 해석'}
+            {isLoading ? '🔄 Analyzing...' : '🚀 Interpret Code'}
           </button>
           <button 
             onClick={clearAll}
             className="clear-button"
           >
-            🗑️ 초기화
+            🗑️ Clear
           </button>
         </div>
 
@@ -144,7 +144,7 @@ const CodeInterpretation = () => {
           onChange={handleCodeChange}
           placeholder={`${language === 'python' ? 'def hello_world():\n    print("Hello, World!")' : 
                         language === 'javascript' ? 'function helloWorld() {\n    console.log("Hello, World!");\n}' :
-                        '여기에 코드를 입력하세요...'}`}
+                        'Enter your code here...'}`}
           className="code-input"
           rows={12}
         />
@@ -152,18 +152,18 @@ const CodeInterpretation = () => {
 
       {error && (
         <div className="error-section">
-          <h3>❌ 오류</h3>
+          <h3>❌ Error</h3>
           <p className="error-message">{error}</p>
         </div>
       )}
 
       {result && (
         <div className="results-section">
-          <h3>분석 결과</h3>
+          <h3>Analysis Results</h3>
           
-          {/* 해석 결과 */}
+          {/* Interpretation Result */}
           <div className="interpretation-result">
-            <h4>코드 해석</h4>
+            <h4>Code Interpretation</h4>
             <div className="interpretation-content">
               {result.interpretation.split('\n').map((line, index) => {
                 if (line.startsWith('##')) {
@@ -180,25 +180,25 @@ const CodeInterpretation = () => {
             </div>
           </div>
 
-          {/* 코드 구조 */}
+          {/* Code Structure */}
           {/* {formatCodeStructure(result.code_structure)} */}
 
-          {/* 유사한 코드 예제 */}
+          {/* Similar Code Examples */}
           {/* {result.similar_code_examples && result.similar_code_examples.length > 0 && (
             <div className="similar-code-section">
-              <h4>🔗 유사한 코드 패턴</h4>
+              <h4>🔗 Similar Code Patterns</h4>
               <div className="similar-code-list">
                 {result.similar_code_examples.map((example, index) => (
                   <div key={index} className="similar-code-item">
                     <div className="similarity-header">
                       <span className="code-name">{example.name}</span>
                       <span className="similarity-score">
-                        유사도: {(example.similarity_score * 100).toFixed(1)}%
+                        Similarity: {(example.similarity_score * 100).toFixed(1)}%
                       </span>
                     </div>
                     <div className="code-details">
-                      <span className="code-type">타입: {example.code_type?.join(', ') || 'Unknown'}</span>
-                      <span className="file-path">파일: {example.file_path}</span>
+                      <span className="code-type">Type: {example.code_type?.join(', ') || 'Unknown'}</span>
+                      <span className="file-path">File: {example.file_path}</span>
                     </div>
                   </div>
                 ))}
@@ -206,10 +206,10 @@ const CodeInterpretation = () => {
             </div>
           )} */}
 
-          {/* 개선 제안 */}
+          {/* Suggestions */}
           {result.suggestions && result.suggestions.length > 0 && (
             <div className="suggestions-section">
-              <h4>💡 개선 제안</h4>
+              <h4>💡 Suggestions</h4>
               <ul className="suggestions-list">
                 {result.suggestions.map((suggestion, index) => (
                   <li key={index} className="suggestion-item">
@@ -226,7 +226,3 @@ const CodeInterpretation = () => {
 };
 
 export default CodeInterpretation;
-
-
-
-

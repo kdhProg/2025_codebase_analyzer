@@ -86,18 +86,18 @@ const FileTreeVisualization = ({ fileStructure }) => {
   };
 
   if (!fileStructure) {
-    return <div className="no-data">파일 구조 데이터가 없습니다.</div>;
+    return <div className="no-data">No file structure data available.</div>;
   }
 
   return (
     <div className="file-tree-container">
-      <h3>📁 프로젝트 파일 구조</h3>
+      <h3>📁 Project File Structure</h3>
       <div className="tree-controls">
         <button 
           onClick={() => setExpandedNodes(new Set())}
           className="control-button"
         >
-          모두 접기
+          Collapse All
         </button>
         <button 
           onClick={() => {
@@ -106,7 +106,7 @@ const FileTreeVisualization = ({ fileStructure }) => {
           }}
           className="control-button"
         >
-          모두 펼치기
+          Expand All
         </button>
       </div>
       <div className="file-tree">
@@ -116,7 +116,7 @@ const FileTreeVisualization = ({ fileStructure }) => {
   );
 };
 
-// 모든 경로를 재귀적으로 수집하는 헬퍼 함수
+// Helper function to recursively collect all paths
 const getAllPaths = (node, path = '') => {
   const currentPath = path ? `${path}/${node.name}` : node.name;
   const paths = [currentPath];
@@ -131,4 +131,3 @@ const getAllPaths = (node, path = '') => {
 };
 
 export default FileTreeVisualization;
-

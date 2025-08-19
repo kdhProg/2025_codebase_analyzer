@@ -16,7 +16,7 @@ const ProjectAnalysis = () => {
   const [activeTab, setActiveTab] = useState('tree'); // tree, charts, dependency
   const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
   
-  // 고급 옵션 상태
+  // Advanced option state
   const [includePatterns, setIncludePatterns] = useState(['*.py', '*.js', '*.jsx', '*.ts', '*.tsx', '*.java', '*.cpp', '*.c']);
   const [excludePatterns, setExcludePatterns] = useState(['__pycache__', 'node_modules', '.git', '.venv', 'venv', 'env']);
 
@@ -26,7 +26,7 @@ const ProjectAnalysis = () => {
 
   const handleAnalyzeProject = async () => {
     if (!projectPath.trim()) {
-      setError('프로젝트 경로를 입력해주세요.');
+      setError('Please enter the project path.');
       return;
     }
 
@@ -35,7 +35,7 @@ const ProjectAnalysis = () => {
     setFileStructure(null);
 
     try {
-      // 파일 스캔 API 사용
+      // Use file scan API
       const response = await fetch('http://localhost:8000/scan-project-path', {
         method: 'POST',
         headers: {
@@ -54,7 +54,7 @@ const ProjectAnalysis = () => {
       const data = await response.json();
       setFileStructure(data.file_structure);
     } catch (err) {
-      setError(`프로젝트 분석 중 오류가 발생했습니다: ${err.message}`);
+      setError(`An error occurred during project analysis: ${err.message}`);
       console.error('Project analysis error:', err);
     } finally {
       setIsAnalyzing(false);
@@ -69,7 +69,7 @@ const ProjectAnalysis = () => {
   };
 
   const addIncludePattern = () => {
-    const newPattern = prompt('포함할 파일 패턴을 입력하세요 (예: *.py):');
+    const newPattern = prompt('Enter the file pattern to include (e.g., *.py):');
     if (newPattern && !includePatterns.includes(newPattern)) {
       setIncludePatterns([...includePatterns, newPattern]);
     }
@@ -80,7 +80,7 @@ const ProjectAnalysis = () => {
   };
 
   const addExcludePattern = () => {
-    const newPattern = prompt('제외할 디렉토리/파일 패턴을 입력하세요:');
+    const newPattern = prompt('Enter the directory/file pattern to exclude:');
     if (newPattern && !excludePatterns.includes(newPattern)) {
       setExcludePatterns([...excludePatterns, newPattern]);
     }
@@ -93,13 +93,13 @@ const ProjectAnalysis = () => {
   return (
     <div className="project-analysis-container">
       <div className="analysis-header">
-        <h2>프로젝트 구조 시각화</h2>
-        <p>경로 기반 파일 구조와 통계를 시각적으로 분석</p>
+        <h2>Project Structure Visualization</h2>
+        <p>Visually analyze path-based file structures and statistics</p>
       </div>
 
       <div className="input-section">
         <div className="path-input-group">
-          <label htmlFor="projectPath">프로젝트 경로:</label>
+          <label htmlFor="projectPath">Project Path:</label>
           <input
             id="projectPath"
             type="text"
@@ -117,14 +117,14 @@ const ProjectAnalysis = () => {
             onClick={() => setShowAdvancedOptions(!showAdvancedOptions)}
             className="toggle-button"
           >
-            {showAdvancedOptions ? '▼' : '▶'} 고급 옵션
+            {showAdvancedOptions ? '▼' : '▶'} Advanced Options
           </button>
         </div>
 
         {showAdvancedOptions && (
           <div className="advanced-options">
             <div className="option-group">
-              <label>포함할 파일 패턴:</label>
+              <label>File patterns to include:</label>
               <div className="pattern-list">
                 {includePatterns.map((pattern, index) => (
                   <div key={index} className="pattern-item">
@@ -138,13 +138,13 @@ const ProjectAnalysis = () => {
                   </div>
                 ))}
                 <button onClick={addIncludePattern} className="add-pattern">
-                  + 패턴 추가
+                  + Add Pattern
                 </button>
               </div>
             </div>
 
             <div className="option-group">
-              <label>제외할 패턴:</label>
+              <label>Patterns to exclude:</label>
               <div className="pattern-list">
                 {excludePatterns.map((pattern, index) => (
                   <div key={index} className="pattern-item">
@@ -158,7 +158,7 @@ const ProjectAnalysis = () => {
                   </div>
                 ))}
                 <button onClick={addExcludePattern} className="add-pattern">
-                  + 패턴 추가
+                  + Add Pattern
                 </button>
               </div>
             </div>
@@ -171,17 +171,17 @@ const ProjectAnalysis = () => {
             disabled={isAnalyzing || !projectPath.trim()}
             className="analyze-button"
           >
-            {isAnalyzing ? '🔄 분석 중...' : '프로젝트 분석'}
+            {isAnalyzing ? '🔄 Analyzing...' : 'Analyze Project'}
           </button>
           <button onClick={clearAll} className="clear-button">
-            초기화
+            Reset
           </button>
         </div>
       </div>
 
       {error && (
         <div className="error-section">
-          <h3>❌ 오류</h3>
+          <h3>❌ Error</h3>
           <p className="error-message">{error}</p>
         </div>
       )}
@@ -193,19 +193,19 @@ const ProjectAnalysis = () => {
               className={`tab-button ${activeTab === 'tree' ? 'active' : ''}`}
               onClick={() => setActiveTab('tree')}
             >
-              📁 파일 구조
+              📁 File Structure
             </button>
             <button
               className={`tab-button ${activeTab === 'charts' ? 'active' : ''}`}
               onClick={() => setActiveTab('charts')}
             >
-              📊 통계 차트
+              📊 Statistics Charts
             </button>
             <button
               className={`tab-button ${activeTab === 'dependency' ? 'active' : ''}`}
               onClick={() => setActiveTab('dependency')}
             >
-              🔗 의존성 맵
+              🔗 Dependency Map
             </button>
           </div>
 
@@ -229,7 +229,3 @@ const ProjectAnalysis = () => {
 };
 
 export default ProjectAnalysis;
-
-
-
-

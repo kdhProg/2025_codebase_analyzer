@@ -4,28 +4,28 @@ import React, { useState, useEffect } from 'react';
 import '../css/analysisPage.css';
 
 function AnalysisPage({ projectRootPath, selectedPaths, onAnalysisComplete, onAnalysisError }) {
-  const [stage, setStage] = useState('파일 분석 및 DB 저장');
+  const [stage, setStage] = useState('File Analysis and DB Save');
   const [progress, setProgress] = useState(0);
   const [currentFile, setCurrentFile] = useState('');
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // 프로젝트 경로와 선택된 파일 목록이 없으면 함수 실행을 중단
+    // Stop execution if project path or selected files are missing
     if (!projectRootPath || selectedPaths.length === 0) {
       return;
     }
 
-    // 컴포넌트가 마운트되어 있는지 추적하는 플래그
+    // Track whether component is mounted
     let isMounted = true;
 
-    // AbortController를 생성하여 요청을 취소할 수 있게 합니다.
+    // Create AbortController to cancel request if needed
     const controller = new AbortController();
     const signal = controller.signal;
 
     const startAnalysisStream = async () => {
-      // 분석이 시작될 때 상태를 초기화합니다.
+      // Reset states when analysis starts
       if (isMounted) {
-        setStage('파일 분석 및 DB 저장');
+        setStage('File Analysis and DB Save');
         setProgress(0);
         setCurrentFile('');
         setError(null);
@@ -41,12 +41,12 @@ function AnalysisPage({ projectRootPath, selectedPaths, onAnalysisComplete, onAn
             project_root_path: projectRootPath,
             selected_paths: selectedPaths,
           }),
-          signal, // AbortController의 signal을 fetch 요청에 전달
+          signal,
         });
 
         if (!response.ok || !response.body) {
-          const errorData = await response.json().catch(() => ({ detail: "알 수 없는 오류" }));
-          throw new Error(errorData.detail || `HTTP 오류: ${response.status}`);
+          const errorData = await response.json().catch(() => ({ detail: "Unknown error" }));
+          throw new Error(errorData.detail || `HTTP error: ${response.status}`);
         }
 
         const reader = response.body.getReader();
@@ -66,8 +66,8 @@ function AnalysisPage({ projectRootPath, selectedPaths, onAnalysisComplete, onAn
               if (done) {
                 console.log('Stream finished.');
                 if (isMounted && stage !== 'completed' && stage !== 'error') {
-                  setError("분석 스트림이 예상치 못하게 종료되었습니다.");
-                  onAnalysisError("분석 스트림이 예상치 못하게 종료되었습니다.");
+                  setError("Analysis stream unexpectedly terminated.");
+                  onAnalysisError("Analysis stream unexpectedly terminated.");
                 }
                 break;
               }
@@ -87,7 +87,7 @@ function AnalysisPage({ projectRootPath, selectedPaths, onAnalysisComplete, onAn
                     if (isMounted) {
                       if (data.status === 'in_progress') {
                         if (data.file_path) {
-                          setStage('파일 분석 및 DB 저장');
+                          setStage('File Analysis and DB Save');
                           setProgress(data.progress);
                           setCurrentFile(data.file_path);
                         } else if (data.stage) {
@@ -101,7 +101,7 @@ function AnalysisPage({ projectRootPath, selectedPaths, onAnalysisComplete, onAn
                         reader.cancel();
                         return;
                       } else if (data.status === 'error') {
-                        const errorMessage = data.message || "분석 중 오류 발생.";
+                        const errorMessage = data.message || "Error occurred during analysis.";
                         setError(errorMessage);
                         setStage('error');
                         onAnalysisError(errorMessage);
@@ -112,7 +112,7 @@ function AnalysisPage({ projectRootPath, selectedPaths, onAnalysisComplete, onAn
                   } catch (e) {
                     console.error("Failed to parse JSON from stream message:", message, e);
                     if (isMounted) {
-                        const parseErrorMessage = "서버 응답 파싱 중 오류 발생.";
+                        const parseErrorMessage = "Error occurred while parsing server response.";
                         setError(parseErrorMessage);
                         setStage('error');
                         onAnalysisError(parseErrorMessage);
@@ -134,9 +134,9 @@ function AnalysisPage({ projectRootPath, selectedPaths, onAnalysisComplete, onAn
         readStream();
 
       } catch (err) {
-        console.error("코드 분석 요청 중 오류 발생:", err);
+        console.error("Error occurred during code analysis request:", err);
         if (err.name !== 'AbortError' && isMounted) {
-            const requestErrorMessage = err.message || "알 수 없는 오류가 발생했습니다.";
+            const requestErrorMessage = err.message || "An unknown error occurred.";
             setError(requestErrorMessage);
             setStage('error');
             onAnalysisError(requestErrorMessage);
@@ -146,24 +146,24 @@ function AnalysisPage({ projectRootPath, selectedPaths, onAnalysisComplete, onAn
     
     startAnalysisStream();
 
-    // 클린업 함수: 컴포넌트가 언마운트되거나 의존성 배열이 변경될 때 호출됩니다.
+    // Cleanup when component unmounts or dependencies change
     return () => {
       console.log('useEffect cleanup: Aborting fetch request.');
-      isMounted = false; // 플래그를 false로 설정하여 상태 업데이트를 막습니다.
+      isMounted = false;
       controller.abort();
     };
-  }, [projectRootPath, selectedPaths, onAnalysisComplete, onAnalysisError]); // 'stage' 의존성을 제거
+  }, [projectRootPath, selectedPaths, onAnalysisComplete, onAnalysisError]);
   
   if (error) {
     return (
       <div className="analysis-container error-container">
-        <h2 style={{ color: '#cc0000' }}>오류 발생</h2>
+        <h2 style={{ color: '#cc0000' }}>Error Occurred</h2>
         <p style={{ fontSize: '1.1em' }}>{error}</p>
         <button
-          onClick={() => onAnalysisError("재시도")}
+          onClick={() => onAnalysisError("Retry")}
           className="error-button"
         >
-          파일 재선택
+          Re-select Files
         </button>
       </div>
     );
@@ -175,16 +175,16 @@ function AnalysisPage({ projectRootPath, selectedPaths, onAnalysisComplete, onAn
 
   return (
     <div className="analysis-container analyzing-container">
-      <h2 className="analysis-title">코드 분석 중</h2>
+      <h2 className="analysis-title">Code Analysis in Progress</h2>
       <div className="stage-info">
-        <p>현재 단계: <strong>{stage}</strong></p>
+        <p>Current Stage: <strong>{stage}</strong></p>
       </div>
       <p className="analysis-subtitle">
-        {stage === '파일 분석 및 DB 저장' && (
-          <>현재 분석 중인 파일: <strong className="current-file-path">{currentFile || '파일 로딩 중...'}</strong></>
+        {stage === 'File Analysis and DB Save' && (
+          <>Currently analyzing file: <strong className="current-file-path">{currentFile || 'Loading file...'}</strong></>
         )}
-        {stage !== '파일 분석 및 DB 저장' && (
-          <strong className="current-file-path">AI 모델이 코드를 처리하고 있습니다.</strong>
+        {stage !== 'File Analysis and DB Save' && (
+          <strong className="current-file-path">AI model is processing the code.</strong>
         )}
       </p>
       <div className="progress-bar-container">
@@ -196,7 +196,7 @@ function AnalysisPage({ projectRootPath, selectedPaths, onAnalysisComplete, onAn
         </div>
       </div>
       <p className="analysis-description">
-        {stage === '파일 분석 및 DB 저장' ? '파일을 파싱하고 지식 그래프를 생성 중...' : '임베딩을 생성하고 저장 중...'}
+        {stage === 'File Analysis and DB Save' ? 'Parsing files and generating knowledge graph...' : 'Generating and saving embeddings...'}
       </p>
       <div className="spinner"></div>
     </div>

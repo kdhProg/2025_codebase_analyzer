@@ -27,19 +27,19 @@ const DirectorySelector = ({ onScanResult, onLoadingChange, onError }) => {
                     project_root_path: responseData.project_root_absolute_path 
                 });
             } else {
-                console.error("백엔드 응답 형식이 올바르지 않습니다:", responseData);
-                if (onError) onError("서버로부터 유효한 스캔 결과를 받지 못했습니다.");
+                console.error("Invalid backend response format:", responseData);
+                if (onError) onError("Did not receive a valid scan result from the server.");
             }
         } catch (err) {
             console.error("Error scanning directory:", err);
-            let errorMessage = '디렉토리 스캔 중 알 수 없는 오류 발생';
+            let errorMessage = 'Unknown error occurred while scanning directory';
 
             if (err.response) {
-                errorMessage = err.response.data.detail || err.response.data.message || '서버 오류가 발생했습니다.';
+                errorMessage = err.response.data.detail || err.response.data.message || 'A server error has occurred.';
             } else if (err.request) {
-                errorMessage = '네트워크 오류 또는 서버에 연결할 수 없습니다.';
+                errorMessage = 'Network error or unable to connect to the server.';
             } else {
-                errorMessage = err.message || '요청 처리 중 오류 발생';
+                errorMessage = err.message || 'Error occurred while processing the request.';
             }
             
             setError(errorMessage);
@@ -54,20 +54,20 @@ const DirectorySelector = ({ onScanResult, onLoadingChange, onError }) => {
         <div className="directory-selector-container">
             <form onSubmit={handleSubmit} className="directory-selector-form">
                 <label htmlFor="projectPath">
-                    프로젝트 경로 입력:
+                    Enter project path:
                 </label>
                 <input
                     type="text"
                     id="projectPath"
                     value={projectPath}
                     onChange={(e) => setProjectPath(e.target.value)}
-                    placeholder="예: /Users/yourname/my_project"
+                    placeholder="e.g. /Users/yourname/my_project"
                 />
                 <button type="submit" disabled={loading}>
-                    {loading ? '스캔 중' : '스캔'}
+                    {loading ? 'Scanning...' : 'Scan'}
                 </button>
             </form>
-            {error && <p className="error-message">에러: {error}</p>}
+            {error && <p className="error-message">Error: {error}</p>}
         </div>
     );
 };

@@ -3,7 +3,7 @@ import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Toolti
 import '../css/statisticsCharts.css';
 
 const StatisticsCharts = ({ fileStructure, analysisResult }) => {
-  // 파일 구조에서 언어별 통계 추출
+  // Extract language statistics from the file structure
   const getLanguageStats = () => {
     const languageCounts = {};
     
@@ -30,7 +30,7 @@ const StatisticsCharts = ({ fileStructure, analysisResult }) => {
       .sort((a, b) => b.count - a.count);
   };
 
-  // 파일 크기별 통계
+  // Statistics by file size
   const getFileSizeStats = () => {
     const sizeRanges = [
       { range: '0-1KB', min: 0, max: 1024, count: 0 },
@@ -42,8 +42,8 @@ const StatisticsCharts = ({ fileStructure, analysisResult }) => {
     
     const countBySize = (node) => {
       if (node.type === 'file') {
-        // 파일 크기 정보가 있다면 사용, 없다면 기본값
-        const fileSize = node.file_size || 1024; // 기본값 1KB
+        // Use file size if available, otherwise use a default value
+        const fileSize = node.file_size || 1024; // Default to 1KB
         
         for (const range of sizeRanges) {
           if (fileSize >= range.min && fileSize < range.max) {
@@ -65,7 +65,7 @@ const StatisticsCharts = ({ fileStructure, analysisResult }) => {
     return sizeRanges.filter(range => range.count > 0);
   };
 
-  // 디렉토리 깊이별 통계
+  // Statistics by directory depth
   const getDepthStats = () => {
     const depthCounts = {};
     
@@ -86,12 +86,12 @@ const StatisticsCharts = ({ fileStructure, analysisResult }) => {
       .sort((a, b) => parseInt(a.depth.split(' ')[1]) - parseInt(b.depth.split(' ')[1]));
   };
 
-  // 파일 타입별 통계
+  // Statistics by file type
   const getFileTypeStats = () => {
-    const typeCounts = { '파일': 0, '디렉토리': 0 };
+    const typeCounts = { 'File': 0, 'Directory': 0 };
     
     const countTypes = (node) => {
-      typeCounts[node.type === 'file' ? '파일' : '디렉토리']++;
+      typeCounts[node.type === 'file' ? 'File' : 'Directory']++;
       
       if (node.children) {
         node.children.forEach(countTypes);
@@ -145,12 +145,12 @@ const StatisticsCharts = ({ fileStructure, analysisResult }) => {
 
   return (
     <div className="statistics-charts-container">
-      <h3>📊 프로젝트 통계</h3>
+      <h3>📊 Project Statistics</h3>
       
       <div className="charts-grid">
-        {/* 언어별 파일 분포 */}
+        {/* File Distribution by Language */}
         <div className="chart-card">
-          <h4>🌐 언어별 파일 분포</h4>
+          <h4>🌐 File Distribution by Language</h4>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
@@ -172,9 +172,9 @@ const StatisticsCharts = ({ fileStructure, analysisResult }) => {
           </ResponsiveContainer>
         </div>
 
-        {/* 파일 크기별 분포 */}
+        {/* File Distribution by Size */}
         <div className="chart-card">
-          <h4>📏 파일 크기별 분포</h4>
+          <h4>📏 File Distribution by Size</h4>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={fileSizeStats}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -186,9 +186,9 @@ const StatisticsCharts = ({ fileStructure, analysisResult }) => {
           </ResponsiveContainer>
         </div>
 
-        {/* 디렉토리 깊이별 분포 */}
+        {/* Directory Depth Distribution */}
         <div className="chart-card">
-          <h4>📂 디렉토리 깊이별 분포</h4>
+          <h4>📂 Directory Depth Distribution</h4>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={depthStats}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -200,9 +200,9 @@ const StatisticsCharts = ({ fileStructure, analysisResult }) => {
           </ResponsiveContainer>
         </div>
 
-        {/* 파일 타입별 분포 */}
+        {/* File Type Distribution */}
         <div className="chart-card">
-          <h4>📁 파일 타입별 분포</h4>
+          <h4>📁 File Type Distribution</h4>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
@@ -225,24 +225,24 @@ const StatisticsCharts = ({ fileStructure, analysisResult }) => {
         </div>
       </div>
 
-      {/* 요약 통계 */}
+      {/* Summary Statistics */}
       <div className="summary-stats">
-        <h4>📋 요약 통계</h4>
+        <h4>📋 Summary Statistics</h4>
         <div className="stats-grid">
           <div className="stat-item">
-            <span className="stat-label">총 파일 수:</span>
-            <span className="stat-value">{fileTypeStats.find(s => s.type === '파일')?.count || 0}</span>
+            <span className="stat-label">Total Files:</span>
+            <span className="stat-value">{fileTypeStats.find(s => s.type === 'File')?.count || 0}</span>
           </div>
           <div className="stat-item">
-            <span className="stat-label">총 디렉토리 수:</span>
-            <span className="stat-value">{fileTypeStats.find(s => s.type === '디렉토리')?.count || 0}</span>
+            <span className="stat-label">Total Directories:</span>
+            <span className="stat-value">{fileTypeStats.find(s => s.type === 'Directory')?.count || 0}</span>
           </div>
           <div className="stat-item">
-            <span className="stat-label">지원 언어 수:</span>
+            <span className="stat-label">Supported Languages:</span>
             <span className="stat-value">{languageStats.length}</span>
           </div>
           <div className="stat-item">
-            <span className="stat-label">최대 깊이:</span>
+            <span className="stat-label">Max Depth:</span>
             <span className="stat-value">{depthStats.length > 0 ? depthStats[depthStats.length - 1].depth.split(' ')[1] : 0}</span>
           </div>
         </div>
@@ -252,4 +252,3 @@ const StatisticsCharts = ({ fileStructure, analysisResult }) => {
 };
 
 export default StatisticsCharts;
-
