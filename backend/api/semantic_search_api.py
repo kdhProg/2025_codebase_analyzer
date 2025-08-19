@@ -13,6 +13,12 @@ class SearchRequest(BaseModel):
     query: str
     top_k: int = 5
 
+# 새로운 Pydantic 응답 데이터 모델 정의
+# LLM 답변과 함께 추론 근거가 될 노드 정보를 담습니다.
+class SearchResponse(BaseModel):
+    text: str
+    evidence: List[Dict[str, Any]]
+
 # APIRouter 인스턴스 생성
 router = APIRouter()
 
@@ -36,10 +42,11 @@ async def lifespan(app: APIRouter):
     semantic_search_service.close_neo4j_driver()
 
 
-@router.post("/semantic-search", response_model=str)
+@router.post("/semantic-search", response_model=SearchResponse)
 async def semantic_search_endpoint(request: SearchRequest):
     """
     자연어 쿼리를 받아 관련성이 높은 코드 컨텍스트를 찾고, 이를 기반으로 자연어 답변을 생성합니다.
+    최종 응답은 LLM 답변과 추론 근거(노드 정보)를 포함하는 JSON 객체입니다.
     """
     
     # 1. 자연어 쿼리로 유사한 노드 ID를 찾습니다.
@@ -54,7 +61,8 @@ async def semantic_search_endpoint(request: SearchRequest):
 
     if not results_with_ids:
         logger.warning("No similar code snippets found.")
-        return "유사한 코드 스니펫을 찾을 수 없습니다. 다른 쿼리로 다시 시도해주세요."
+        # 유사한 노드를 찾지 못한 경우, 빈 evidence 리스트와 함께 메시지 반환
+        return SearchResponse(text="유사한 코드 스니펫을 찾을 수 없습니다. 다른 쿼리로 다시 시도해주세요.", evidence=[])
         
     # 2. 찾은 노드 ID로 Neo4j에서 실제 코드 컨텍스트(노드 + 릴레이션)를 가져옵니다.
     node_ids = [result["node_id"] for result in results_with_ids]
@@ -69,9 +77,12 @@ async def semantic_search_endpoint(request: SearchRequest):
     # 3. LLM 모델을 사용하여 자연어 답변을 생성합니다.
     # LLM 서비스는 이제 노드와 릴레이션이 포함된 더 풍부한 데이터를 받게 됩니다.
     if not code_contexts_from_db:
-        return "유사한 코드는 찾았으나, 해당 코드를 추출하는 데 실패했습니다. 데이터베이스를 확인해주세요."
+        # 코드는 찾았지만 컨텍스트를 추출하지 못한 경우, 빈 evidence 리스트와 함께 메시지 반환
+        return SearchResponse(text="유사한 코드는 찾았으나, 해당 코드를 추출하는 데 실패했습니다. 데이터베이스를 확인해주세요.", evidence=[])
         
     # generate_natural_language_response 함수도 새로운 데이터 구조를 처리하도록 수정해야 합니다.
-    final_response = llm_service.generate_natural_language_response(request.query, code_contexts_from_db)
+    final_response_text = llm_service.generate_natural_language_response(request.query, code_contexts_from_db)
     
-    return final_response
+    # 4. LLM 답변과 노드 정보를 합쳐 새로운 모델로 반환합니다.
+    return SearchResponse(text=final_response_text, evidence=code_contexts_from_db)
+

@@ -387,3 +387,111 @@ body {
 .footer-links span:hover {
     color: var(--primary-color);
 }
+
+
+/* 추론 근거 토글 버튼 스타일 */
+.toggle-evidence-button {
+    background-color: #003b75; /* 어두운 배경 */
+    color: #ffffff; /* 밝은 텍스트 */
+    border: 1px solid #495057; /* 약간 더 밝은 테두리 */
+    border-radius: 20px; /* 둥근 모양 */
+    padding: 8px 16px; /* 내부 여백 */
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin-top: 10px;
+}
+
+/* 마우스 오버 시 스타일 변경 */
+.toggle-evidence-button:hover {
+    background-color: #478bcf; /* 호버 시 약간 밝아짐 */
+    transform: translateY(-2px); /* 살짝 위로 이동하는 효과 */
+}
+
+/* 클릭 시 스타일 변경 */
+.toggle-evidence-button:active {
+    background-color: #212529; /* 클릭 시 더 어두워짐 */
+    transform: translateY(0); /* 원래 위치로 돌아옴 */
+}
+
+
+
+/* 추론 근거 목록 컨테이너 */
+.evidence-list {
+    background-color: #000000;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 10px;
+    font-size: 14px;
+    color: #333;
+}
+
+/* 목록 제목 */
+.evidence-list h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #ffffff;
+    border-bottom: 1px dashed #e0e0e0;
+    padding-bottom: 5px;
+}
+
+/* 각 노드 항목 */
+.evidence-node {
+    background-color: #643a7c;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+/* 노드 정보 (Type: ID) */
+.node-info {
+    font-weight: bold;
+    color: #007bff;
+    margin-bottom: 5px;
+}
+
+/* 노드 타입 강조 */
+.node-type {
+    background-color: #eaf5ff;
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: #0056b3;
+    font-size: 12px;
+}
+
+/* 파일 경로 */
+.evidence-filepath {
+    color: #6c757d;
+    font-style: italic;
+    margin: 5px 0;
+    word-break: break-all; /* 긴 경로도 잘 보이게 */
+}
+
+/* 파일 아이콘 */
+.filepath-icon {
+    margin-right: 5px;
+}
+
+/* 코드 블록 */
+.evidence-codeblock {
+    background-color: #282c34;
+    color: #abb2bf;
+    padding: 10px;
+    border-radius: 4px;
+    white-space: pre-wrap; /* 줄바꿈 유지 */
+    overflow-x: auto; /* 가로 스크롤 허용 */
+}
+
+/* 코드 스니펫이 없을 때 메시지 */
+.no-snippet-message {
+    background-color: #282c34;
+    color: #abb2bf;
+    padding: 8px;
+    border-radius: 4px;
+    text-align: center;
+}

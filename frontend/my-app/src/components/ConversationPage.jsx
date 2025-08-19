@@ -13,6 +13,7 @@ function ConversationPage({ analysisSummary }) {
     const [input, setInput] = useState(''); // 사용자 입력 텍스트
     const [isLoading, setIsLoading] = useState(false); // API 호출 로딩 상태
     const chatWindowRef = useRef(null); // 채팅창 스크롤을 위한 Ref
+    const [visibleEvidenceIndex, setVisibleEvidenceIndex] = useState(null);
 
     // 컴포넌트가 마운트될 때, 초기 질문과 LLM 응답을 설정합니다.
     useEffect(() => {
@@ -51,6 +52,11 @@ function ConversationPage({ analysisSummary }) {
         }
     };
 
+    const handleToggleEvidence = (index) => {
+        // 현재 인덱스와 같으면 닫고, 다르면 해당 인덱스로 설정
+        setVisibleEvidenceIndex(prevIndex => prevIndex === index ? null : index);
+    };
+
     // 메시지 전송 핸들러
     const handleSendMessage = async () => {
         if (input.trim() === '') return; // 입력값이 비어 있으면 전송하지 않음
@@ -63,14 +69,16 @@ function ConversationPage({ analysisSummary }) {
         try {
             // 시맨틱 검색 API 호출
             // 백엔드에서 문자열 응답을 받습니다.
-            const llmResponseText = await searchSemanticAPI(newUserMessage.text);
+            const llmResponse= await searchSemanticAPI(newUserMessage.text);
 
             // LLM 응답 메시지를 생성하고, 받은 텍스트를 그대로 사용합니다.
             const newLLMMessage = {
                 sender: 'LLM',
-                text: llmResponseText, // 백엔드에서 받은 문자열을 그대로 사용
-                evidence: null // 더 이상 증거 코드를 백엔드에서 받지 않으므로 null로 설정
+                text: llmResponse.text, // 백엔드에서 받은 문자열을 그대로 사용
+                evidence: llmResponse.evidence
             };
+
+            // console.log(llmResponse.evidence);
             setMessages(prevMessages => [...prevMessages, newLLMMessage]);
         } catch (error) {
             console.error("API 호출 중 오류 발생:", error);
@@ -137,9 +145,50 @@ function ConversationPage({ analysisSummary }) {
                         </div>
                     </div>
                     <div className="chat-window" ref={chatWindowRef}>
+                        {/* LLM 메시지에만 추론 근거 버튼을 표시 */}
                         {messages.map((message, index) => (
                             <div key={index} className={`chat-bubble ${message.sender}`}>
                                 <ReactMarkdown>{message.text}</ReactMarkdown>
+                                {message.sender === 'LLM' && message.evidence && message.evidence.length > 0 && (
+                                    <div className="evidence-section">
+                                        <button 
+                                            className="toggle-evidence-button" 
+                                            onClick={() => handleToggleEvidence(index)}
+                                        >
+                                            추론 근거 표시 ({visibleEvidenceIndex === index ? '닫기' : '보기'})
+                                        </button>
+                                        {/* visibleEvidenceIndex가 현재 메시지의 인덱스와 같을 때만 근거를 표시 */}
+                                        {visibleEvidenceIndex === index && (
+                                            <div className="evidence-list">
+                                                <h4>추론에 사용된 노드:</h4>
+                                                {message.evidence.map((node, nodeIndex) => (
+                                                    <div key={nodeIndex} className="evidence-node">
+                                                        {/* 노드 ID와 타입은 항상 표시 */}
+                                                        <p className="node-info">
+                                                            <span className="node-type">{node.type}</span>: {node.node_id}
+                                                        </p>
+                                                        {/* 파일 경로가 존재할 때만 렌더링 */}
+                                                        {node.file_path && (
+                                                            <p className="evidence-filepath">
+                                                                <span className="filepath-icon">📄</span>{node.file_path}
+                                                            </p>
+                                                        )}
+                                                        {/* 코드 스니펫이 존재하고 내용이 있을 때만 렌더링 */}
+                                                        {node.code_snippet && node.code_snippet.trim() ? (
+                                                            <pre className="evidence-codeblock">
+                                                                <code>{node.code_snippet}</code>
+                                                            </pre>
+                                                        ) : (
+                                                            <p className="no-snippet-message">
+                                                                이 노드에 대한 코드 스니펫을 찾을 수 없습니다.
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
                             </div>
                         ))}
                         {isLoading && (
