@@ -94,7 +94,7 @@ function Home() {
         case 'initial_scan':
             return (
                 <div className="home-entire-container">
-                    <h1>로컬 코드베이스 탐색 도구</h1>
+                    <h1>코드베이스 탐색</h1>
                     <DirectorySelector
                         onScanResult={handleScanResult}
                         onLoadingChange={handleDirectorySelectorLoadingChange}
