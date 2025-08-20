@@ -32,7 +32,7 @@ Whether onboarding a new developer or exploring a legacy system, this tool can d
 
 ## Architecture
 
-<img width="1175" height="614" alt="Image" src="https://github.com/user-attachments/assets/0607f7c4-e93b-4cbc-9b0e-4c5db99d3169" />
+<img width="800" height="auto" alt="Image" src="https://github.com/user-attachments/assets/0607f7c4-e93b-4cbc-9b0e-4c5db99d3169" />
 
 
 ---
@@ -40,34 +40,34 @@ Whether onboarding a new developer or exploring a legacy system, this tool can d
 ## Screenshots
 
 - **Main page - project path input box**
-<img width="1851" height="832" alt="Image" src="https://github.com/user-attachments/assets/590badef-4eee-4794-91f4-f899ebb107f7" />
+<img width="800" height="auto" alt="Image" src="https://github.com/user-attachments/assets/590badef-4eee-4794-91f4-f899ebb107f7" />
 
 - **File Explorer**
-<img width="784" height="838" alt="Image" src="https://github.com/user-attachments/assets/aa17bbb8-9025-4d78-b862-2d614ca0bbf0" />
+<img width="800" height="auto" alt="Image" src="https://github.com/user-attachments/assets/aa17bbb8-9025-4d78-b862-2d614ca0bbf0" />
 
 - **Analysis progress bar**
-<img width="780" height="625" alt="Image" src="https://github.com/user-attachments/assets/fa84d333-6dbc-49cd-8041-0b2e8a0808f5" />
+<img width="800" height="auto" alt="Image" src="https://github.com/user-attachments/assets/fa84d333-6dbc-49cd-8041-0b2e8a0808f5" />
 
 - **Conversation Page 1**
-<img width="1078" height="845" alt="Image" src="https://github.com/user-attachments/assets/8d3f2bf3-76ae-482c-92a1-b9d7e6e22f72" />
+<img width="800" height="auto" alt="Image" src="https://github.com/user-attachments/assets/8d3f2bf3-76ae-482c-92a1-b9d7e6e22f72" />
 
 - **Conversation Page 2**
-<img width="1048" height="840" alt="Image" src="https://github.com/user-attachments/assets/4d4de0df-11f2-4c16-acce-1d8cc26b9995" />
+<img width="800" height="auto" alt="Image" src="https://github.com/user-attachments/assets/4d4de0df-11f2-4c16-acce-1d8cc26b9995" />
 
 - **Chatbubble - evidence nodes**
-<img width="1041" height="823" alt="Image" src="https://github.com/user-attachments/assets/fbbf460c-f4ec-43d2-9021-df380239c82e" />
+<img width="800" height="auto" alt="Image" src="https://github.com/user-attachments/assets/fbbf460c-f4ec-43d2-9021-df380239c82e" />
 
 - **Code Analysis Page**
-<img width="500" height="800" alt="Image" src="https://github.com/user-attachments/assets/27b1a68a-dd92-4ee4-9b8c-a384087ff9aa" />
+<img width="500" height="auto" alt="Image" src="https://github.com/user-attachments/assets/27b1a68a-dd92-4ee4-9b8c-a384087ff9aa" />
 
 - **Statistics Page 1 - directory structure**
-<img width="912" height="825" alt="Image" src="https://github.com/user-attachments/assets/2a1b19fb-2164-4670-b79b-24987fcc3da1" />
+<img width="800" height="auto" alt="Image" src="https://github.com/user-attachments/assets/2a1b19fb-2164-4670-b79b-24987fcc3da1" />
 
 - **Statistics Page 2 - charts**
-<img width="559" height="834" alt="Image" src="https://github.com/user-attachments/assets/193d3550-b3fd-4757-8fd8-e1cd14e4d0e1" />
+<img width="559" height="auto" alt="Image" src="https://github.com/user-attachments/assets/193d3550-b3fd-4757-8fd8-e1cd14e4d0e1" />
 
 - **Statistics Page 3 - dependency graph**
-<img width="811" height="855" alt="Image" src="https://github.com/user-attachments/assets/bb3c3bf7-fc62-4c44-b484-26bec930ee03" />
+<img width="800" height="auto" alt="Image" src="https://github.com/user-attachments/assets/bb3c3bf7-fc62-4c44-b484-26bec930ee03" />
 
 ---
 
