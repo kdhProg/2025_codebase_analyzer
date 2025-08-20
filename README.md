@@ -76,7 +76,7 @@ Whether onboarding a new developer or exploring a legacy system, this tool can d
 <br/>
 
 - **Code Analysis Page**
-<img width="500" height="auto" alt="Image" src="https://github.com/user-attachments/assets/27b1a68a-dd92-4ee4-9b8c-a384087ff9aa" />
+<img width="500" height="auto" alt="Image" src="https://github.com/user-attachments/assets/dccc6da5-cc52-4d30-8ac3-d1200daf996a" />
 <br/>
 <br/>
 <br/>

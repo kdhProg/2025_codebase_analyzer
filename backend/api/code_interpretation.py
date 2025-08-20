@@ -57,14 +57,14 @@ class SimpleCodeInterpreter:
         """
         interpretation_parts = []
         
-        interpretation_parts.append("## 코드 분석 결과\n")
+        interpretation_parts.append("## Results\n")
         
         # 구조 분석 결과
-        interpretation_parts.append("### 코드 구조:")
-        interpretation_parts.append(f"- 총 코드 라인: {structure.get('total_lines_of_code', 0)}개")
-        interpretation_parts.append(f"- 함수: {structure.get('functions_count', 0)}개")
-        interpretation_parts.append(f"- 클래스: {structure.get('classes_count', 0)}개")
-        interpretation_parts.append(f"- 임포트: {structure.get('imports_count', 0)}개")
+        interpretation_parts.append("### Code info:")
+        interpretation_parts.append(f"- lines: {structure.get('total_lines_of_code', 0)}")
+        interpretation_parts.append(f"- function: {structure.get('functions_count', 0)}")
+        interpretation_parts.append(f"- class: {structure.get('classes_count', 0)}")
+        interpretation_parts.append(f"- import statement: {structure.get('imports_count', 0)}")
 
         return "\n".join(interpretation_parts)
     
@@ -75,10 +75,10 @@ class SimpleCodeInterpreter:
         suggestions = []
         
         if 'def ' in code_content:
-            suggestions.append("함수에 docstring을 추가하여 코드 문서화를 개선하세요.")
+            suggestions.append("Improve code documentation by adding a docstring to the function.")
         
         if 'class ' in code_content:
-            suggestions.append("클래스에 대한 설명을 추가하여 가독성을 높여보세요.")
+            suggestions.append("Enhance readability by adding a description to the class.")
             
         return suggestions
 
